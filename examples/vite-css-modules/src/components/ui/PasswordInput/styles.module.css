@@ -1,0 +1,32 @@
+.wrap {
+    position: relative;
+}
+
+.input {
+    padding-inline-end: 2.25rem;
+}
+
+.toggle {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    border: 0;
+    border-start-end-radius: var(--radius-lg);
+    border-end-end-radius: var(--radius-lg);
+    background: none;
+    color: var(--muted-foreground);
+    cursor: pointer;
+}
+
+.toggle:hover {
+    color: var(--foreground);
+}
+
+.toggle:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}

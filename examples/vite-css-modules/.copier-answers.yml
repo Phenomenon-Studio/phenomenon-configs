@@ -1,0 +1,6 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_src_path: gh:Phenomenon-Studio/phenomenon-configs
+project_name: example-vite-css-modules
+project_title: Example Vite CSS Modules
+stack: vite
+styling: css-modules

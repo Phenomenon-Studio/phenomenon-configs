@@ -1,0 +1,16 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    ci:
+        # Pipeline lives in phenomenon-configs; fixes on the same major arrive automatically.
+        uses: Phenomenon-Studio/phenomenon-configs/.github/workflows/node-ci.yml@v1
+        secrets: inherit

@@ -1,0 +1,17 @@
+{
+    "extends": "@phenomenon-studio/tsconfig/next.json",
+    "compilerOptions": {
+        "paths": {
+            "@/*": ["./src/*"]
+        }
+    },
+    "include": [
+        "next-env.d.ts",
+        ".next/types/**/*.ts",
+        ".next/dev/types/**/*.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        "definitions/*.d.ts"
+    ],
+    "exclude": ["node_modules"]
+}

@@ -1,0 +1,15 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "display": "Phenomenon React (browser)",
+    "extends": "./base.json",
+    "compilerOptions": {
+        // `target` = type-check only (`noEmit`); bundlers lower syntax themselves.
+        "target": "ES2022",
+        "useDefineForClassFields": true,
+        // ES2022 = API ceiling of the Vite 8 / Next 16 browser baseline
+        // (chrome111 / edge111 / firefox114 / safari16.4 / ios16.4). No polyfills are shipped, so `lib` must not
+        // exceed what those browsers ship natively. Keep in sync with `ecmaVersion` in @phenomenon-studio/eslint-config.
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "jsx": "react-jsx"
+    }
+}

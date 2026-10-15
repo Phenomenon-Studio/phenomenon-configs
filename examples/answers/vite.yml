@@ -1,0 +1,4 @@
+project_name: example-vite
+project_title: Example Vite
+stack: vite
+styling: tailwind

@@ -1,0 +1,58 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["local>Phenomenon-Studio/phenomenon-configs//renovate/default"],
+    "ignorePaths": ["**/node_modules/**", "examples/**", "templates-examples/**"],
+    "customManagers": [
+        {
+            "description": "Template dependency catalog: npm packages rendered into generated projects",
+            "customType": "regex",
+            "managerFilePatterns": ["/^template/versions\\.jinja$/"],
+            "matchStringsStrategy": "recursive",
+            "matchStrings": ["\"npm\": \\{[^}]+\\}", "\"(?<depName>[^\"]+)\": \"(?<currentValue>[^\"]+)\""],
+            "datasourceTemplate": "npm"
+        },
+        {
+            "description": "Template dependency catalog: Node.js major (.nvmrc, engines)",
+            "customType": "regex",
+            "managerFilePatterns": ["/^template/versions\\.jinja$/"],
+            "matchStrings": ["\"node\": \"(?<currentValue>[^\"]+)\""],
+            "depNameTemplate": "node",
+            "datasourceTemplate": "node-version",
+            "versioningTemplate": "node"
+        },
+        {
+            "description": "Template dependency catalog: pnpm (packageManager)",
+            "customType": "regex",
+            "managerFilePatterns": ["/^template/versions\\.jinja$/"],
+            "matchStrings": ["\"pnpm\": \"(?<currentValue>[^\"]+)\""],
+            "depNameTemplate": "pnpm",
+            "datasourceTemplate": "npm"
+        },
+        {
+            "description": "Annotated pins: `# renovate: datasource=<x> depName=<y>` above a quoted version (Copier in create-app and template-update.yml)",
+            "customType": "regex",
+            "managerFilePatterns": ["/^packages/create-app/bin/.+\\.js$/", "/^\\.github/workflows/.+\\.yml$/"],
+            "matchStrings": [
+                "(?:#|//) renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+)\\s*\\n[^\\n]*?'(?<currentValue>[^']+)'"
+            ]
+        }
+    ],
+    "packageRules": [
+        {
+            "description": "@phenomenon-studio versions in the catalog are written by `pnpm template:sync-versions` on release",
+            "matchFileNames": ["template/versions.jinja"],
+            "matchPackageNames": ["@phenomenon-studio/**"],
+            "enabled": false
+        },
+        {
+            "description": "Catalog bumps reach every new project and every `copier update`: label for review",
+            "matchFileNames": ["template/versions.jinja"],
+            "labels": ["dependencies", "template"]
+        },
+        {
+            "description": "Config package peers stay wide; only widen, never narrow",
+            "matchDepTypes": ["peerDependencies"],
+            "rangeStrategy": "widen"
+        }
+    ]
+}

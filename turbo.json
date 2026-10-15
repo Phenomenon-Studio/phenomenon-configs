@@ -1,0 +1,21 @@
+{
+    "$schema": "https://turborepo.com/schema.json",
+    "agentGuidance": false,
+    "globalPassThroughEnv": ["NEXT_WORKSPACE_ROOT", "NEXT_PUBLIC_API_URL"],
+    "tasks": {
+        "lint": {
+            "dependsOn": ["^lint"],
+            "outputs": []
+        },
+        "typecheck": {
+            "outputs": []
+        },
+        "test": {
+            "outputs": []
+        },
+        "build": {
+            "dependsOn": ["^build"],
+            "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+        }
+    }
+}

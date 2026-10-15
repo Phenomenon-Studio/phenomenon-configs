@@ -1,0 +1,8 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "display": "Phenomenon Vite app",
+    "extends": "./react.json",
+    "compilerOptions": {
+        "types": ["vite/client"]
+    }
+}

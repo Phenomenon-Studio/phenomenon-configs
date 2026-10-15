@@ -1,0 +1,14 @@
+packages:
+  - packages/*
+  - examples/*
+
+engineStrict: true
+saveExact: true
+savePrefix: ''
+# Examples depend on `@phenomenon-studio/*` with real semver ranges (exactly as generated projects do);
+# linking makes them resolve to the local packages so config changes are tested in the same PR.
+linkWorkspacePackages: true
+minimumReleaseAge: 4320
+minimumReleaseAgeExclude:
+  - '@phenomenon-studio/*'
+minimumReleaseAgeIgnoreMissingTime: false

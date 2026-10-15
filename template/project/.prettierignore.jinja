@@ -1,0 +1,15 @@
+**/node_modules
+**/dist
+**/tmp
+**/coverage
+**/storybook-static
+pnpm-lock.yaml
+{%- if stack == 'vite' %}
+src/routeTree.gen.ts
+/public/mockServiceWorker.js
+{%- endif %}
+{%- if stack == 'next' %}
+/.next
+/out
+next-env.d.ts
+{%- endif %}

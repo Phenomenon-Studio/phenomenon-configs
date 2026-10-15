@@ -1,0 +1,48 @@
+# Template + reusable workflows: tag vX.Y.Z, move the vX major tag, publish release notes.
+# Copier only sees PEP 440 tags (vX.Y.Z); package tags (@phenomenon-studio/x@1.2.3) are ignored by it.
+name: Release template
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: Version to release, e.g. v1.4.0 (major bump = breaking; add MIGRATIONS.md notes first)
+                required: true
+                type: string
+
+permissions:
+    contents: write
+
+jobs:
+    tag:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
+            - name: Validate version
+              env:
+                  VERSION: ${{ inputs.version }}
+              run: |
+                  [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Use vX.Y.Z"; exit 1; }
+                  if git rev-parse "$VERSION" >/dev/null 2>&1; then echo "::error::$VERSION exists"; exit 1; fi
+                  latest=$(git tag --list 'v*.*.*' --sort=-v:refname | head -1)
+                  if [ -n "$latest" ] && [ "$(printf '%s\n%s\n' "$latest" "$VERSION" | sort -V | tail -1)" != "$VERSION" ]; then
+                      echo "::error::$VERSION is not greater than $latest"; exit 1
+                  fi
+            - name: Tag and move major tag
+              env:
+                  VERSION: ${{ inputs.version }}
+              run: |
+                  major="${VERSION%%.*}"
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git tag -a "$VERSION" -m "$VERSION"
+                  git tag -fa "$major" -m "$major → $VERSION"
+                  git push origin "$VERSION"
+                  git push --force origin "$major"
+            - name: GitHub release
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  VERSION: ${{ inputs.version }}
+              run: gh release create "$VERSION" --generate-notes --verify-tag --title "$VERSION"

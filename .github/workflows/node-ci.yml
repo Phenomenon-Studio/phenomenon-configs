@@ -1,0 +1,75 @@
+# Reusable CI for Phenomenon Studio projects. Projects call it from .github/workflows/ci.yml (rendered by the
+# template) and pin a major tag: `uses: Phenomenon-Studio/phenomenon-configs/.github/workflows/node-ci.yml@v1`.
+name: Node CI
+
+on:
+    workflow_call:
+        inputs:
+            node-version:
+                description: Node.js version. Empty = read .nvmrc
+                type: string
+                default: ''
+            working-directory:
+                description: Folder with the project's package.json (relative to the repo root)
+                type: string
+                default: .
+            build-env:
+                description: Extra KEY=VALUE lines exported before lint/build (e.g. public env vars required at build)
+                type: string
+                default: ''
+            run-build:
+                type: boolean
+                default: true
+        secrets:
+            NPM_TOKEN:
+                description: Token with read:packages for @phenomenon-studio packages. Defaults to GITHUB_TOKEN.
+                required: false
+
+permissions:
+    contents: read
+    packages: read
+
+jobs:
+    ci:
+        name: lint · typecheck · test · build
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        defaults:
+            run:
+                working-directory: ${{ inputs.working-directory }}
+        env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN || github.token }}
+            # Turbopack/output tracing root for Next.js (see next.config.ts); the repo root is always safe.
+            NEXT_WORKSPACE_ROOT: ${{ github.workspace }}
+        steps:
+            - uses: actions/checkout@v7
+
+            - uses: pnpm/action-setup@v6
+              with:
+                  package_json_file: ${{ inputs.working-directory }}/package.json
+
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: ${{ inputs.node-version }}
+                  node-version-file: ${{ inputs.node-version == '' && format('{0}/.nvmrc', inputs.working-directory) || '' }}
+                  cache: pnpm
+                  cache-dependency-path: '**/pnpm-lock.yaml'
+                  registry-url: https://npm.pkg.github.com
+                  scope: '@phenomenon-studio'
+
+            - name: Export build env
+              if: inputs.build-env != ''
+              env:
+                  BUILD_ENV: ${{ inputs.build-env }}
+              run: printf '%s\n' "$BUILD_ENV" >> "$GITHUB_ENV"
+
+            - run: pnpm install --frozen-lockfile
+
+            - run: pnpm lint
+
+            - run: pnpm run --if-present tsc
+
+            - run: pnpm run --if-present test
+
+            - if: inputs.run-build
+              run: pnpm build

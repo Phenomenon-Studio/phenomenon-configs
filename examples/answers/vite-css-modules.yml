@@ -1,0 +1,4 @@
+project_name: example-vite-css-modules
+project_title: Example Vite CSS Modules
+stack: vite
+styling: css-modules

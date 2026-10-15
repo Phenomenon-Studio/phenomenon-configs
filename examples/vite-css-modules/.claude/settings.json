@@ -1,0 +1,42 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(pnpm run build)",
+            "Bash(pnpm run tsc)",
+            "Bash(pnpm run lint*)",
+            "Bash(pnpm run fix*)",
+            "WebFetch",
+            "WebSearch",
+            "MCPSearch",
+            "mcp__context7__resolve-library-id",
+            "mcp__context7__query-docs"
+        ],
+        "deny": ["Read(./.env.local)", "Edit(./.env.local)"]
+    },
+    "hooks": {
+        "PostToolUse": [
+            {
+                "matcher": "Edit|Write|MultiEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "pnpm fix:fmt"
+                    }
+                ]
+            }
+        ]
+    },
+    "statusLine": {
+        "type": "command",
+        "command": "bash .claude/statusline-command.sh"
+    },
+    "enabledPlugins": {
+        "typescript-lsp@claude-plugins-official": true,
+        "context7@claude-plugins-official": true,
+        "playwright@claude-plugins-official": true,
+        "figma@claude-plugins-official": true,
+        "chrome-devtools-mcp@claude-plugins-official": true,
+        "skill-creator@claude-plugins-official": true,
+        "mattpocock-skills@claude-plugins-official": true
+    }
+}

@@ -1,0 +1,38 @@
+# Packages: Changesets opens a "Version packages" PR; merging it publishes to GitHub Packages.
+name: Release packages
+
+on:
+    push:
+        branches: [main]
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+    contents: write
+    pull-requests: write
+    packages: write
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+            # `version-packages` regenerates examples/ with the new versions, which needs Copier.
+            - uses: astral-sh/setup-uv@v10
+            - uses: pnpm/action-setup@v6
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+                  registry-url: https://npm.pkg.github.com
+                  scope: '@phenomenon-studio'
+            - run: pnpm install --frozen-lockfile
+            - uses: changesets/action@v2
+              with:
+                  version: pnpm version-packages
+                  publish: pnpm release-packages
+                  title: 'chore(release): version packages'
+                  commit: 'chore(release): version packages'
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

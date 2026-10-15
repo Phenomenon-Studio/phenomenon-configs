@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="color-scheme" content="light dark" />
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#19191a" media="(prefers-color-scheme: dark)" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet" />
+        <title>Phenomenon Studio Admin Panel</title>
+        <script>
+            (() => {
+                const themeLocalStorageValue = window.localStorage.getItem("<appName>_ADMIN_Theme");
+                const isPrefersDarkTheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                const root = window.document.documentElement;
+                root.classList.remove("light", "dark");
+                if (
+                    themeLocalStorageValue === "system" ||
+                    (themeLocalStorageValue !== "dark" && themeLocalStorageValue !== "light")
+                ) {
+                    root.classList.add(isPrefersDarkTheme ? "dark" : "light");
+                } else {
+                    root.classList.add(themeLocalStorageValue);
+                }
+            })();
+        </script>
+        <%- injectScript %>
+        <style id="initial-style">
+            :root {
+                --initial-bg: rgb(255 255 255);
+            }
+
+            html.dark {
+                --initial-bg: rgb(25 25 26);
+            }
+
+            html {
+                font-family: "Geist", sans-serif;
+            }
+
+            body {
+                background-color: var(--initial-bg);
+                margin: 0;
+                position: relative;
+            }
+
+            #root {
+                height: 100dvh;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script type="module" src="/src/main.tsx"></script>
+    </body>
+</html>

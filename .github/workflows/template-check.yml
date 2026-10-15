@@ -1,0 +1,97 @@
+name: Template check
+
+on:
+    pull_request:
+    push:
+        branches: [main]
+
+permissions:
+    contents: read
+    packages: read
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    packages:
+        name: Packages · lint and smoke tests
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+            - uses: pnpm/action-setup@v6
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm lint:root
+            - run: pnpm test
+
+    regen:
+        name: Examples match the template
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+            - uses: astral-sh/setup-uv@v10
+            - uses: pnpm/action-setup@v6
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile
+            - name: Regenerate examples from this PR's template
+              run: pnpm examples:regen
+            - name: Fail on drift
+              run: |
+                  if ! git diff --exit-code -- examples/ || [ -n "$(git status --porcelain -- examples/)" ]; then
+                      git status --short -- examples/
+                      echo "::error::examples/ is out of date with template/. Run 'pnpm examples:regen' and commit."
+                      exit 1
+                  fi
+
+    examples:
+        name: Example · ${{ matrix.stack }}
+        strategy:
+            fail-fast: false
+            matrix:
+                stack: [vite, vite-css-modules, next]
+        # Same reusable workflow projects use, so a change to it is exercised here first.
+        uses: ./.github/workflows/node-ci.yml
+        with:
+            working-directory: examples/${{ matrix.stack }}
+            build-env: |
+                NEXT_PUBLIC_API_URL=https://example.com
+
+    update:
+        name: Upgrade from last release · ${{ matrix.stack }}
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                stack: [vite, vite-css-modules, next]
+        steps:
+            - uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
+            - uses: astral-sh/setup-uv@v10
+            - uses: pnpm/action-setup@v6
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile
+            - name: Render last release, update to this commit, assert clean merge + green build
+              env:
+                  NEXT_PUBLIC_API_URL: https://example.com
+              run: pnpm template:update-test ${{ matrix.stack }}
+
+    renovate-config:
+        name: Renovate config is valid
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+            - run: npx --yes --package renovate -- renovate-config-validator --strict renovate.json renovate/default.json

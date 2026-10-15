@@ -1,0 +1,144 @@
+/* Design tokens: same palette as the Tailwind variant. Dark mode = `.dark` on <html> (ThemeContext). */
+:root {
+    --background: rgb(255 255 255);
+    --foreground: rgb(25 25 26);
+    --card: rgb(255 255 255);
+    --card-foreground: rgb(25 25 26);
+    --popover: rgb(255 255 255);
+    --popover-foreground: rgb(25 25 26);
+    --primary: rgb(25 25 26);
+    --primary-foreground: rgb(250 250 250);
+    --secondary: rgb(245 245 245);
+    --secondary-foreground: rgb(25 25 26);
+    --muted: rgb(245 245 245);
+    --muted-foreground: rgb(115 115 115);
+    --accent: rgb(245 245 245);
+    --accent-foreground: rgb(25 25 26);
+    --destructive: rgb(231 0 11);
+    --destructive-foreground: rgb(255 255 255);
+    --border: rgb(229 229 229);
+    --input: rgb(229 229 229);
+    --ring: rgb(161 161 161);
+    --radius: 0.625rem;
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, "SFMono-Regular", "Menlo", "Monaco", "Consolas", monospace;
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --focus-ring: 0 0 0 3px color-mix(in srgb, var(--ring) 50%, transparent);
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+    color-scheme: light;
+}
+
+.dark {
+    --background: rgb(25 25 26);
+    --foreground: rgb(250 250 250);
+    --card: rgb(25 25 26);
+    --card-foreground: rgb(250 250 250);
+    --popover: rgb(38 38 38);
+    --popover-foreground: rgb(250 250 250);
+    --primary: rgb(229 229 229);
+    --primary-foreground: rgb(25 25 26);
+    --secondary: rgb(38 38 38);
+    --secondary-foreground: rgb(250 250 250);
+    --muted: rgb(38 38 38);
+    --muted-foreground: rgb(161 161 161);
+    --accent: rgb(64 64 64);
+    --accent-foreground: rgb(250 250 250);
+    --destructive: rgb(255 100 103);
+    --destructive-foreground: rgb(250 250 250);
+    --border: rgb(40 40 40);
+    --input: rgb(52 52 52);
+    --ring: rgb(115 115 115);
+
+    color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    border-color: var(--border);
+}
+
+html {
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100dvh;
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+    margin: 0;
+}
+
+img,
+svg {
+    display: block;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+    color: inherit;
+}
+
+a {
+    color: inherit;
+}
+
+:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Router pending state (src/lib/@router.tsx). */
+.page-loader {
+    margin: auto;
+    color: var(--muted-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}

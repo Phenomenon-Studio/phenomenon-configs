@@ -1,0 +1,6 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_src_path: gh:Phenomenon-Studio/phenomenon-configs
+project_name: example-vite
+project_title: Example Vite
+stack: vite
+styling: tailwind

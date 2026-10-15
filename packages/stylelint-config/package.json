@@ -1,0 +1,42 @@
+{
+    "name": "@phenomenon-studio/stylelint-config",
+    "version": "1.0.0",
+    "description": "Shared Stylelint config for Phenomenon Studio projects",
+    "license": "UNLICENSED",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Phenomenon-Studio/phenomenon-configs.git",
+        "directory": "packages/stylelint-config"
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
+    },
+    "files": [
+        "index.js",
+        "tailwind.js",
+        "index.d.ts"
+    ],
+    "exports": {
+        ".": {
+            "types": "./index.d.ts",
+            "default": "./index.js"
+        },
+        "./tailwind": {
+            "types": "./index.d.ts",
+            "default": "./tailwind.js"
+        }
+    },
+    "scripts": {
+        "test": "node test/smoke.js"
+    },
+    "dependencies": {
+        "stylelint-config-standard": "40.0.0"
+    },
+    "devDependencies": {
+        "stylelint": "17.16.0"
+    },
+    "peerDependencies": {
+        "stylelint": "^17.0.0"
+    }
+}

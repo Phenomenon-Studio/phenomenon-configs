@@ -1,0 +1,119 @@
+.button {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    height: 2rem;
+    padding: 0 0.625rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-lg);
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition:
+        background-color 150ms,
+        color 150ms,
+        box-shadow 150ms;
+}
+
+.button:hover {
+    background-color: color-mix(in srgb, var(--primary) 85%, transparent);
+}
+
+.button:active {
+    translate: 0 1px;
+}
+
+.button:disabled,
+.button[data-disabled] {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.button svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+.button[data-variant="outline"] {
+    border-color: var(--border);
+    background-color: var(--background);
+    color: var(--foreground);
+}
+
+.button[data-variant="secondary"] {
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+}
+
+.button[data-variant="ghost"] {
+    background-color: transparent;
+    color: var(--foreground);
+}
+
+.button[data-variant="outline"]:hover,
+.button[data-variant="secondary"]:hover,
+.button[data-variant="ghost"]:hover {
+    background-color: var(--muted);
+}
+
+.button[data-variant="destructive"] {
+    background-color: color-mix(in srgb, var(--destructive) 10%, transparent);
+    color: var(--destructive);
+}
+
+.button[data-variant="destructive"]:hover {
+    background-color: color-mix(in srgb, var(--destructive) 20%, transparent);
+}
+
+.button[data-variant="link"] {
+    height: auto;
+    padding: 0;
+    background-color: transparent;
+    color: var(--primary);
+    text-underline-offset: 4px;
+}
+
+.button[data-variant="link"]:hover {
+    text-decoration: underline;
+}
+
+.button[data-size="sm"] {
+    height: 1.75rem;
+    padding: 0 0.5rem;
+    font-size: 0.8rem;
+}
+
+.button[data-size="lg"] {
+    height: 2.5rem;
+    padding: 0 1rem;
+    font-size: 1rem;
+}
+
+.button[data-size="icon"] {
+    width: 2rem;
+    padding: 0;
+}
+
+.hidden {
+    display: contents;
+    visibility: hidden;
+}
+
+.spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

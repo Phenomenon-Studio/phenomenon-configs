@@ -1,0 +1,7 @@
+import {{ stack }} from '@phenomenon-studio/eslint-config/{{ stack }}';
+import { defineConfig } from 'eslint/config';
+
+export default defineConfig([
+    ...{{ stack }},
+    // Local overrides only.
+]);

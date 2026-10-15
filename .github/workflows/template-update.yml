@@ -1,0 +1,93 @@
+# Reusable "template update" job: runs `copier update` against the latest template release and opens a PR when the
+# project is behind. Projects call it on a schedule from .github/workflows/template-update.yml (rendered by the
+# template), so template changes arrive the same way as Renovate's dependency PRs.
+name: Template update
+
+on:
+    workflow_call:
+        inputs:
+            working-directory:
+                type: string
+                default: .
+            copier-version:
+                type: string
+                # renovate: datasource=pypi depName=copier
+                default: '9.19.1'
+        secrets:
+            TEMPLATE_TOKEN:
+                description: Token that can read Phenomenon-Studio/phenomenon-configs (private repo) and push PR branches
+                required: true
+            NPM_TOKEN:
+                description: Token with read:packages for @phenomenon-studio packages. Defaults to GITHUB_TOKEN.
+                required: false
+
+permissions:
+    contents: write
+    pull-requests: write
+    packages: read
+
+jobs:
+    update:
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        defaults:
+            run:
+                working-directory: ${{ inputs.working-directory }}
+        env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN || github.token }}
+        steps:
+            - uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
+
+            - uses: astral-sh/setup-uv@v10
+
+            - uses: pnpm/action-setup@v6
+              with:
+                  package_json_file: ${{ inputs.working-directory }}/package.json
+
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: ${{ inputs.working-directory }}/.nvmrc
+                  registry-url: https://npm.pkg.github.com
+                  scope: '@phenomenon-studio'
+
+            - name: Authenticate template access
+              env:
+                  TOKEN: ${{ secrets.TEMPLATE_TOKEN }}
+              run: git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+
+            - name: Copier update
+              id: update
+              run: |
+                  before=$(grep '^_commit:' .copier-answers.yml | cut -d' ' -f2)
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  uvx --from "copier==${{ inputs.copier-version }}" copier update \
+                      --trust --defaults --skip-answered --skip-tasks --conflict inline
+                  after=$(grep '^_commit:' .copier-answers.yml | cut -d' ' -f2)
+                  echo "before=$before" >> "$GITHUB_OUTPUT"
+                  echo "after=$after" >> "$GITHUB_OUTPUT"
+                  if grep -rIl --exclude-dir=node_modules --exclude-dir=.git '^<<<<<<< ' . > /tmp/conflicts; then
+                      echo "conflicts=true" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Refresh lockfile
+              if: steps.update.outputs.before != steps.update.outputs.after
+              run: pnpm install --no-frozen-lockfile --ignore-scripts
+
+            - uses: peter-evans/create-pull-request@v8
+              if: steps.update.outputs.before != steps.update.outputs.after
+              with:
+                  token: ${{ secrets.TEMPLATE_TOKEN }}
+                  branch: chore/template-update
+                  commit-message: 'chore(template): update to ${{ steps.update.outputs.after }}'
+                  title: 'chore(template): update to ${{ steps.update.outputs.after }}'
+                  labels: platform
+                  body: |
+                      Template update `${{ steps.update.outputs.before }}` → `${{ steps.update.outputs.after }}`
+                      from [phenomenon-configs](https://github.com/Phenomenon-Studio/phenomenon-configs/releases/tag/${{ steps.update.outputs.after }}).
+
+                      ${{ steps.update.outputs.conflicts == 'true' && '**Conflicts:** some files contain `<<<<<<<` markers where local edits overlap template changes. Resolve them on this branch before merging.' || 'Merged cleanly.' }}
+
+                      Read the release notes and MIGRATIONS.md for manual steps.

@@ -1,0 +1,11 @@
+{%- if styling == 'tailwind' -%}
+import config from '@phenomenon-studio/prettier-config/tailwind';
+
+/** @type {import("prettier").Config} */
+export default {
+    ...config,
+    tailwindStylesheet: './src/styles/index.css',
+};
+{%- else -%}
+export { default } from '@phenomenon-studio/prettier-config';
+{%- endif %}

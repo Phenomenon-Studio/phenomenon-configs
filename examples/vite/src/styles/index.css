@@ -1,0 +1,130 @@
+@import "tailwindcss" source(none);
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@source "../../src";
+@source "../../index.html";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+    --background: rgb(255 255 255);
+    --foreground: rgb(25 25 26);
+    --card: rgb(255 255 255);
+    --card-foreground: rgb(25 25 26);
+    --popover: rgb(255 255 255);
+    --popover-foreground: rgb(25 25 26);
+    --primary: rgb(25 25 26);
+    --primary-foreground: rgb(250 250 250);
+    --secondary: rgb(245 245 245);
+    --secondary-foreground: rgb(25 25 26);
+    --muted: rgb(245 245 245);
+    --muted-foreground: rgb(115 115 115);
+    --accent: rgb(245 245 245);
+    --accent-foreground: rgb(25 25 26);
+    --destructive: rgb(231 0 11);
+    --destructive-foreground: rgb(255 255 255);
+    --border: rgb(229 229 229);
+    --input: rgb(229 229 229);
+    --ring: rgb(161 161 161);
+    --chart-1: rgb(159 146 255);
+    --chart-2: rgb(97 58 246);
+    --chart-3: rgb(92 37 239);
+    --chart-4: rgb(86 26 218);
+    --chart-5: rgb(82 31 173);
+    --sidebar: rgb(250 250 250);
+    --sidebar-foreground: rgb(25 25 26);
+    --sidebar-primary: rgb(25 25 26);
+    --sidebar-primary-foreground: rgb(250 250 250);
+    --sidebar-accent: rgb(245 245 245);
+    --sidebar-accent-foreground: rgb(25 25 26);
+    --sidebar-border: rgb(229 229 229);
+    --sidebar-ring: rgb(161 161 161);
+    --radius: 0.625rem;
+}
+
+.dark {
+    --background: rgb(25 25 26);
+    --foreground: rgb(250 250 250);
+    --card: rgb(25 25 26);
+    --card-foreground: rgb(250 250 250);
+    --popover: rgb(38 38 38);
+    --popover-foreground: rgb(250 250 250);
+    --primary: rgb(229 229 229);
+    --primary-foreground: rgb(25 25 26);
+    --secondary: rgb(38 38 38);
+    --secondary-foreground: rgb(250 250 250);
+    --muted: rgb(38 38 38);
+    --muted-foreground: rgb(161 161 161);
+    --accent: rgb(64 64 64);
+    --accent-foreground: rgb(250 250 250);
+    --destructive: rgb(255 100 103);
+    --destructive-foreground: rgb(250 250 250);
+    --border: rgb(40 40 40);
+    --input: rgb(52 52 52);
+    --ring: rgb(115 115 115);
+    --chart-1: rgb(159 146 255);
+    --chart-2: rgb(97 58 246);
+    --chart-3: rgb(92 37 239);
+    --chart-4: rgb(86 26 218);
+    --chart-5: rgb(82 31 173);
+    --sidebar: rgb(25 25 26);
+    --sidebar-foreground: rgb(250 250 250);
+    --sidebar-primary: rgb(91 20 230);
+    --sidebar-primary-foreground: rgb(250 250 250);
+    --sidebar-accent: rgb(38 38 38);
+    --sidebar-accent-foreground: rgb(250 250 250);
+    --sidebar-border: rgb(40 40 40);
+    --sidebar-ring: rgb(82 82 82);
+}
+
+@theme inline {
+    --font-sans: "Geist", sans-serif;
+    --font-serif: ui-serif, "Georgia", "Cambria", "Times New Roman", "Times", serif;
+    --font-mono:
+        ui-monospace, "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", monospace;
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+}

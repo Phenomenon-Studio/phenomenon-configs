@@ -1,0 +1,9 @@
+**/node_modules
+**/dist
+**/tmp
+**/coverage
+**/storybook-static
+pnpm-lock.yaml
+/.next
+/out
+next-env.d.ts

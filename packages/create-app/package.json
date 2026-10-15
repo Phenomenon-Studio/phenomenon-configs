@@ -1,0 +1,28 @@
+{
+    "name": "@phenomenon-studio/create-app",
+    "version": "1.0.0",
+    "description": "Create or update a Phenomenon Studio project from the shared Copier template",
+    "license": "UNLICENSED",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Phenomenon-Studio/phenomenon-configs.git",
+        "directory": "packages/create-app"
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
+    },
+    "bin": {
+        "create-app": "./bin/create-app.js",
+        "phenomenon-template": "./bin/create-app.js"
+    },
+    "files": [
+        "bin"
+    ],
+    "scripts": {
+        "test": "node bin/create-app.js --help"
+    },
+    "engines": {
+        "node": ">=24"
+    }
+}

@@ -1,0 +1,5 @@
+# TODO: name the owners of platform releases (required before v1.0.0), e.g.
+# *                   @Phenomenon-Studio/frontend-leads
+# /packages/          @Phenomenon-Studio/frontend-leads
+# /template/          @Phenomenon-Studio/frontend-leads
+# /.github/workflows/ @Phenomenon-Studio/frontend-leads

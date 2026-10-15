@@ -1,0 +1,51 @@
+.wrap {
+    width: 100%;
+    max-width: 28rem;
+    padding: 1.5rem;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: var(--muted-foreground);
+    text-wrap: balance;
+}
+
+.password-label {
+    justify-content: space-between;
+}
+
+.forgot {
+    margin-left: auto;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 400;
+    text-decoration: none;
+    text-underline-offset: 2px;
+}
+
+.forgot:hover {
+    text-decoration: underline;
+}
+
+.submit {
+    width: 100%;
+}
+
+@media (min-width: 48rem) {
+    .wrap {
+        padding: 2rem;
+    }
+}

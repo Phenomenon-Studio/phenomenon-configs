@@ -1,0 +1,58 @@
+{
+    "skill_name": "shadcn",
+    "evals": [
+        {
+            "id": 1,
+            "prompt": "Create a settings form with fields for: full name, email address, and notification preferences (email, SMS, push as toggles). Add validation and a submit button with loading state. Use TanStack Form with Zod validation.",
+            "expected_output": "A named function component using FieldGroup, Field, TanStack Form (useForm + form.Field), Switch toggles, data-invalid/aria-invalid, Button isLoading via form.Subscribe, gap-* spacing, semantic colors, single quotes, 4-space indent.",
+            "files": [],
+            "expectations": [
+                "Uses named function declaration (not arrow function) for the component",
+                "Uses FieldGroup and Field components for form layout instead of raw div with space-y",
+                "Uses useForm from @tanstack/react-form with Zod validators.onSubmit",
+                "Uses form.Field render prop for each field with field.state.meta for validation",
+                "Uses Switch for notification toggles (not looping Button with manual active state)",
+                "Uses data-invalid on Field and aria-invalid on controls for validation states",
+                "Uses form.Subscribe with Button isLoading={isSubmitting} for submit button",
+                "Uses gap-* instead of space-y-* or space-x-* for spacing",
+                "Uses semantic color tokens, not raw colors",
+                "Uses single quotes and 4-space indentation"
+            ]
+        },
+        {
+            "id": 2,
+            "prompt": "Create a dialog for editing a user profile. Avatar at top, input fields for name and bio, Save/Cancel buttons with icons. Wire save to a TanStack Query mutation with loading state.",
+            "expected_output": "A named function component with DialogTitle, Avatar+AvatarFallback, data-icon on icons, render prop (not asChild) for Base UI triggers, Button isLoading from mutation isPending, lucide-react icons.",
+            "files": [],
+            "expectations": [
+                "Uses named function declaration for the component",
+                "Includes DialogTitle for accessibility (visible or sr-only)",
+                "Avatar includes AvatarFallback",
+                "Icons use data-icon attribute, no sizing classes",
+                "Uses lucide-react for icons",
+                "Uses render prop (not asChild) for DialogTrigger (Base UI)",
+                "Uses useMutation with mutationOptions factory",
+                "Button has isLoading={isPending} from mutation",
+                "Uses single quotes and proper import ordering"
+            ]
+        },
+        {
+            "id": 3,
+            "prompt": "Create a dashboard showing 4 stat cards in a grid with data from TanStack Query. Each card has title, number, percentage badge. Include Suspense loading with Skeleton fallback and Empty state for no data.",
+            "expected_output": "A named function component with Suspense boundary, Skeleton fallback, useSuspenseQuery, full Card composition, Badge for changes, Empty component, semantic colors, gap-* spacing.",
+            "files": [],
+            "expectations": [
+                "Uses named function declaration for components",
+                "Uses Suspense boundary with Skeleton-based fallback component",
+                "Uses useSuspenseQuery (not useQuery) for data fetching",
+                "Uses queryOptions factory from services layer",
+                "Uses full Card composition (CardHeader, CardTitle, CardContent)",
+                "Uses Skeleton for loading placeholders, not custom animate-pulse",
+                "Uses Badge for percentage change, not custom styled spans",
+                "Uses Empty component for no-data state",
+                "Uses semantic colors, not raw values",
+                "Uses gap-* and size-* conventions"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,41 @@
+{
+    "name": "phenomenon-configs",
+    "private": true,
+    "type": "module",
+    "packageManager": "pnpm@11.9.0",
+    "engines": {
+        "node": ">=24",
+        "pnpm": ">=11"
+    },
+    "scripts": {
+        "lint": "turbo run lint",
+        "build": "NEXT_WORKSPACE_ROOT=$PWD turbo run build",
+        "typecheck": "turbo run typecheck",
+        "test": "turbo run test",
+        "check": "NEXT_WORKSPACE_ROOT=$PWD turbo run lint typecheck test build",
+        "lint:root": "eslint --cache --max-warnings 0 \"*.js\" \"scripts/**/*.js\" \"packages/**/*.js\" && prettier --check \"*.{js,json,md,yml}\" \"{scripts,packages,renovate,docs,.github,.changeset}/**/*.{js,json,md,yml}\"",
+        "fix:fmt": "prettier --write \"*.{js,json,md,yml}\" \"{scripts,packages,renovate,docs,.github,.changeset}/**/*.{js,json,md,yml}\"",
+        "examples:regen": "node scripts/regen-examples.js",
+        "template:sync-versions": "node scripts/sync-template-versions.js",
+        "template:update-test": "node scripts/template-update-test.js",
+        "changeset": "changeset",
+        "version-packages": "changeset version && node scripts/sync-template-versions.js && node scripts/regen-examples.js && pnpm install --no-frozen-lockfile",
+        "release-packages": "changeset publish",
+        "prepare": "husky"
+    },
+    "devDependencies": {
+        "@changesets/changelog-github": "0.7.0",
+        "@changesets/cli": "2.31.1",
+        "@commitlint/cli": "21.2.3",
+        "@phenomenon-studio/commitlint-config": "workspace:*",
+        "@phenomenon-studio/eslint-config": "workspace:*",
+        "@phenomenon-studio/prettier-config": "workspace:*",
+        "eslint": "10.12.0",
+        "husky": "9.1.7",
+        "prettier": "3.9.10",
+        "turbo": "2.11.7",
+        "typescript": "6.0.3",
+        "yaml": "2.9.1"
+    },
+    "prettier": "@phenomenon-studio/prettier-config"
+}

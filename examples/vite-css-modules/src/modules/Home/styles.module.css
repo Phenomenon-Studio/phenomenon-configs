@@ -1,0 +1,47 @@
+.wrap {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+        135deg,
+        var(--background),
+        var(--background),
+        color-mix(in srgb, var(--muted) 30%, transparent)
+    );
+}
+
+.hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    max-width: 56rem;
+    padding: 6rem 1.5rem;
+    text-align: center;
+}
+
+.logo {
+    width: auto;
+    height: 4rem;
+}
+
+.title {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+}
+
+.accent {
+    display: block;
+    background: linear-gradient(90deg, var(--primary), color-mix(in srgb, var(--primary) 60%, transparent));
+    background-clip: text;
+    color: transparent;
+}
+
+.description {
+    color: var(--muted-foreground);
+    font-size: 1.25rem;
+    line-height: 1.6;
+}

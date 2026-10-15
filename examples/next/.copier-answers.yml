@@ -1,0 +1,5 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_src_path: gh:Phenomenon-Studio/phenomenon-configs
+project_name: example-next
+project_title: Example Next
+stack: next

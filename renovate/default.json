@@ -1,0 +1,90 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "description": "Phenomenon Studio dependency policy. Projects: { \"extends\": [\"github>Phenomenon-Studio/phenomenon-configs//renovate/default\"] }",
+    "extends": ["config:recommended", ":semanticCommits", ":dependencyDashboard"],
+    "labels": ["dependencies"],
+    "schedule": ["before 6am on monday"],
+    "timezone": "Europe/Kyiv",
+    "minimumReleaseAge": "3 days",
+    "internalChecksFilter": "strict",
+    "prConcurrentLimit": 10,
+    "lockFileMaintenance": {
+        "enabled": true,
+        "schedule": ["before 6am on the first day of the month"]
+    },
+    "vulnerabilityAlerts": {
+        "labels": ["security"],
+        "schedule": ["at any time"],
+        "minimumReleaseAge": null
+    },
+    "hostRules": [
+        {
+            "description": "@phenomenon-studio packages on GitHub Packages; Renovate needs a token with read:packages (RENOVATE_GITHUB_PACKAGES_TOKEN org secret).",
+            "matchHost": "npm.pkg.github.com",
+            "hostType": "npm",
+            "token": "{{ secrets.RENOVATE_GITHUB_PACKAGES_TOKEN }}"
+        }
+    ],
+    "packageRules": [
+        {
+            "description": "Shared configs: one PR, released by us, so no waiting period. Patch/minor automerge once CI passes.",
+            "matchPackageNames": ["@phenomenon-studio/**"],
+            "groupName": "phenomenon platform",
+            "labels": ["dependencies", "platform"],
+            "minimumReleaseAge": null,
+            "schedule": ["at any time"]
+        },
+        {
+            "matchPackageNames": ["@phenomenon-studio/**"],
+            "matchUpdateTypes": ["patch", "minor"],
+            "automerge": true
+        },
+        {
+            "description": "Next.js stack moves together",
+            "matchPackageNames": [
+                "next",
+                "@next/**",
+                "eslint-config-next",
+                "react",
+                "react-dom",
+                "@types/react",
+                "@types/react-dom"
+            ],
+            "groupName": "next and react"
+        },
+        {
+            "description": "Vite stack moves together",
+            "matchPackageNames": ["vite", "@vitejs/**", "@rolldown/**", "rollup-plugin-visualizer", "vite-plugin-html"],
+            "groupName": "vite"
+        },
+        {
+            "matchPackageNames": ["@tanstack/**"],
+            "groupName": "tanstack"
+        },
+        {
+            "matchPackageNames": ["tailwindcss", "@tailwindcss/**", "tw-animate-css"],
+            "groupName": "tailwind"
+        },
+        {
+            "description": "Lint/format tooling; rules themselves come from @phenomenon-studio/* packages",
+            "matchPackageNames": ["eslint", "prettier", "stylelint", "typescript", "@commitlint/**", "husky", "knip"],
+            "groupName": "lint and format tooling"
+        },
+        {
+            "description": "typescript-eslint caps TypeScript (<6.1 today); TS majors/minors go through the platform first",
+            "matchPackageNames": ["typescript"],
+            "matchUpdateTypes": ["major", "minor"],
+            "dependencyDashboardApproval": true
+        },
+        {
+            "description": "Node.js (.nvmrc, engines) and pnpm (packageManager) follow the platform catalog",
+            "matchPackageNames": ["node", "pnpm"],
+            "groupName": "runtime"
+        },
+        {
+            "matchDepTypes": ["action"],
+            "groupName": "github actions",
+            "pinDigests": false
+        }
+    ]
+}

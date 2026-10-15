@@ -1,0 +1,39 @@
+{
+    "name": "@phenomenon-studio/commitlint-config",
+    "version": "1.0.0",
+    "description": "Shared commitlint config (Conventional Commits) for Phenomenon Studio projects",
+    "license": "UNLICENSED",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Phenomenon-Studio/phenomenon-configs.git",
+        "directory": "packages/commitlint-config"
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
+    },
+    "files": [
+        "index.js",
+        "index.d.ts"
+    ],
+    "exports": {
+        ".": {
+            "types": "./index.d.ts",
+            "default": "./index.js"
+        }
+    },
+    "scripts": {
+        "test": "node test/smoke.js"
+    },
+    "dependencies": {
+        "@commitlint/config-conventional": "21.2.3",
+        "@commitlint/types": "21.2.3"
+    },
+    "devDependencies": {
+        "@commitlint/lint": "21.2.3",
+        "@commitlint/load": "21.2.3"
+    },
+    "peerDependencies": {
+        "@commitlint/cli": ">=21.0.0"
+    }
+}

@@ -1,0 +1,4 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["github>Phenomenon-Studio/phenomenon-configs//renovate/default"]
+}

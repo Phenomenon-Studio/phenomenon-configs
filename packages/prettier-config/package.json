@@ -1,0 +1,43 @@
+{
+    "name": "@phenomenon-studio/prettier-config",
+    "version": "1.0.0",
+    "description": "Shared Prettier config for Phenomenon Studio projects",
+    "license": "UNLICENSED",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Phenomenon-Studio/phenomenon-configs.git",
+        "directory": "packages/prettier-config"
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
+    },
+    "files": [
+        "index.js",
+        "tailwind.js",
+        "index.d.ts"
+    ],
+    "exports": {
+        ".": {
+            "types": "./index.d.ts",
+            "default": "./index.js"
+        },
+        "./tailwind": {
+            "types": "./index.d.ts",
+            "default": "./tailwind.js"
+        }
+    },
+    "scripts": {
+        "test": "node test/smoke.js"
+    },
+    "dependencies": {
+        "@ianvs/prettier-plugin-sort-imports": "4.7.1",
+        "prettier-plugin-tailwindcss": "0.8.1"
+    },
+    "devDependencies": {
+        "prettier": "3.9.10"
+    },
+    "peerDependencies": {
+        "prettier": "^3.0.0"
+    }
+}

@@ -1,0 +1,10 @@
+engineStrict: true
+ignoreScripts: true
+saveExact: true
+savePrefix: ''
+minimumReleaseAge: 4320
+minimumReleaseAgeExclude:
+  - '@phenomenon-studio/*'
+# NOTE: If release age is undefined, verify the dependency manually.
+# Once verified, comment out or set to true this line to allow the installation.
+minimumReleaseAgeIgnoreMissingTime: false

@@ -1,0 +1,38 @@
+.nav {
+    flex: 1;
+}
+
+.list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 2rem;
+    padding: 0 0.625rem;
+    border-radius: var(--radius-md);
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+        background-color 150ms,
+        color 150ms;
+}
+
+.link:hover {
+    background-color: var(--muted);
+    color: var(--foreground);
+}
+
+.active {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+}

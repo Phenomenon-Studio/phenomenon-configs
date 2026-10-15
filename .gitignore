@@ -1,0 +1,20 @@
+node_modules
+dist
+tmp
+*.log
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+.turbo
+.DS_Store
+.idea
+.vscode/*
+!.vscode/extensions.json
+
+# Source templates used for the initial audit; each is its own git repo.
+/templates-examples
+
+# Example build outputs
+examples/*/.next
+examples/*/next-env.d.ts
+examples/*/dist

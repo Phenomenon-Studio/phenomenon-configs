@@ -1,0 +1,152 @@
+/* Stacking + swipe follow the Base UI toast CSS variables: https://base-ui.com/react/components/toast */
+.viewport {
+    position: fixed;
+    z-index: 50;
+    inset-inline: 1rem;
+    bottom: 1rem;
+    width: auto;
+    max-width: 24rem;
+    margin: 0 auto;
+    outline: none;
+}
+
+@media (min-width: 40rem) {
+    .viewport {
+        right: 1rem;
+        left: auto;
+        width: 100%;
+        margin: 0;
+    }
+}
+
+.toast {
+    --gap: 0.75rem;
+    --peek: 0.75rem;
+    --scale: calc(max(0, 1 - (var(--toast-index) * 0.1)));
+    --shrink: calc(1 - var(--scale));
+    --height: var(--toast-frontmost-height, var(--toast-height));
+    --offset-y: calc(
+        var(--toast-offset-y) * -1 + (var(--toast-index) * var(--gap) * -1) + var(--toast-swipe-movement-y)
+    );
+
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: calc(1000 - var(--toast-index));
+    width: 100%;
+    height: var(--height);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background-color: var(--popover);
+    color: var(--popover-foreground);
+    box-shadow: var(--shadow-lg);
+    transform-origin: bottom center;
+    transform: translateX(var(--toast-swipe-movement-x))
+        translateY(
+            calc(var(--toast-swipe-movement-y) - (var(--toast-index) * var(--peek)) - (var(--shrink) * var(--height)))
+        )
+        scale(var(--scale));
+    transition:
+        transform 500ms var(--ease-out),
+        opacity 500ms,
+        height 150ms;
+    user-select: none;
+}
+
+.toast::after {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: calc(var(--gap) + 1px);
+    content: "";
+}
+
+.toast[data-expanded] {
+    height: var(--toast-height);
+    transform: translateX(var(--toast-swipe-movement-x)) translateY(var(--offset-y));
+}
+
+.toast[data-starting-style],
+.toast[data-ending-style] {
+    transform: translateY(150%);
+}
+
+.toast[data-limited] {
+    opacity: 0;
+}
+
+.toast[data-ending-style][data-swipe-direction="up"] {
+    transform: translateY(calc(var(--toast-swipe-movement-y) - 150%));
+}
+
+.toast[data-ending-style][data-swipe-direction="down"] {
+    transform: translateY(calc(var(--toast-swipe-movement-y) + 150%));
+}
+
+.toast[data-ending-style][data-swipe-direction="left"] {
+    transform: translateX(calc(var(--toast-swipe-movement-x) - 150%)) translateY(var(--offset-y));
+}
+
+.toast[data-ending-style][data-swipe-direction="right"] {
+    transform: translateX(calc(var(--toast-swipe-movement-x) + 150%)) translateY(var(--offset-y));
+}
+
+.content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    height: 100%;
+    padding: 1rem;
+    overflow: hidden;
+    transition: opacity 250ms var(--ease-out);
+}
+
+.content[data-behind]:not([data-expanded]) {
+    opacity: 0;
+}
+
+.icon {
+    flex-shrink: 0;
+}
+
+.icon[data-type="error"] {
+    color: var(--destructive);
+}
+
+.text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.title {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.description {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+}
+
+.close {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--muted-foreground);
+    cursor: pointer;
+}
+
+.close:hover {
+    background-color: var(--muted);
+    color: var(--foreground);
+}

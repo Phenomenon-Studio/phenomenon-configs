@@ -1,0 +1,9 @@
+**/node_modules
+**/dist
+**/tmp
+**/.turbo
+pnpm-lock.yaml
+/templates-examples
+/template
+/examples
+CHANGELOG.md
