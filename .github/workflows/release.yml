@@ -28,7 +28,7 @@ jobs:
             # Trusted publishing needs npm >= 11.5.1.
             - run: npm install --global npm@11
             - run: pnpm install --frozen-lockfile
-            - uses: changesets/action@v2
+            - uses: changesets/action@v1
               with:
                   version: pnpm version-packages
                   publish: pnpm release-packages
