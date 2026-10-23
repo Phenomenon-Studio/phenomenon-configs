@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { basename, join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
+import * as prompts from './prompts.js';
 import * as ui from './ui.js';
 
 // renovate: datasource=pypi depName=copier
@@ -11,6 +12,8 @@ const TEMPLATE = 'gh:Phenomenon-Studio/phenomenon-configs';
 const { version: VERSION } = JSON.parse(readFileSync(join(import.meta.dirname, '../package.json'), 'utf8'));
 
 const HELP = `${ui.bold('Usage')}
+  ${ui.code('create-app')}
+      Interactive: pick what to do, then name, stack and styling from lists.
   ${ui.code('create-app <directory>')} [--stack vite|next] [--styling tailwind|css-modules] [--ref vX.Y.Z]
       Create a new project: starter app + shared configs.
   ${ui.code('create-app init')} [--stack vite|next] [--styling tailwind|css-modules] [--ref vX.Y.Z] [--overwrite]
@@ -19,8 +22,8 @@ const HELP = `${ui.bold('Usage')}
       Pull the latest (or given) template release into the project in the current directory.
 
 ${ui.bold('Options')}
-  --stack      Skip the stack question (vite | next). init detects it from package.json
-  --styling    Skip the styling question (tailwind | css-modules). init detects it from package.json
+  --stack      vite | next. Asked with a list when omitted; init detects it from package.json
+  --styling    tailwind | css-modules. Asked with a list when omitted (Vite); init detects it
   --ref        Template git tag to use (default: latest release)
   --overwrite  Replace existing config files without asking (init only; review with git diff)
   --defaults   Accept previous answers without prompting (update only)
@@ -34,6 +37,16 @@ ${ui.bold('Examples')}
   ${ui.dim('$')} pnpm dlx @phenomenon-studio/create-app update
 
 Requires uv (https://docs.astral.sh/uv/): ${ui.code('brew install uv')}`;
+
+const STACKS = [
+    { label: 'Vite', value: 'vite', hint: 'React SPA · TanStack Router + Query + Form' },
+    { label: 'Next.js', value: 'next', hint: 'App Router · TanStack Query' },
+];
+const STYLINGS = [
+    { label: 'Tailwind CSS', value: 'tailwind', hint: 'Tailwind v4 + shadcn/ui' },
+    { label: 'CSS Modules', value: 'css-modules', hint: 'plain CSS Modules + Base UI' },
+];
+const KEBAB = /^[a-z0-9][a-z0-9-]*$/;
 
 const { values, positionals } = parseArgs({
     allowPositionals: true,
@@ -56,7 +69,7 @@ if (values.version) {
 
 ui.banner(VERSION);
 
-if (values.help || positionals.length === 0) {
+if (values.help || (positionals.length === 0 && !prompts.interactive)) {
     console.log(HELP);
     console.log();
     process.exit(0);
@@ -66,6 +79,71 @@ const fail = (message) => {
     ui.error(message);
     process.exit(1);
 };
+
+/** Check a flag value against its choices. */
+const option = (name, value, choices) => {
+    if (
+        value !== undefined &&
+        !choices.some((choice) => {
+            return choice.value === value;
+        })
+    ) {
+        fail(
+            `--${name} must be one of: ${choices
+                .map((choice) => {
+                    return choice.value;
+                })
+                .join(', ')}`
+        );
+    }
+
+    return value;
+};
+
+/** A flag value, else a radio list in a terminal, else an error naming the flag. */
+const choose = (name, value, question, choices, initial = 0) => {
+    if (option(name, value, choices)) {
+        return Promise.resolve(value);
+    }
+    if (!prompts.interactive) {
+        fail(
+            `Pass --${name} ${choices
+                .map((choice) => {
+                    return choice.value;
+                })
+                .join('|')} (no terminal to ask in).`
+        );
+    }
+
+    return prompts.select(question, choices, initial);
+};
+
+/** Package name from a directory: lowercase, anything else than letters/digits becomes a dash. */
+const toKebab = (directory) => {
+    return basename(resolve(directory))
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+};
+
+const validateName = (value) => {
+    return KEBAB.test(value) ? undefined : 'Use kebab-case: lowercase letters, digits and dashes (e.g. acme-admin)';
+};
+
+// No arguments in a terminal: ask what to do.
+if (positionals.length === 0) {
+    const action = await prompts.select('What do you want to do?', [
+        { label: 'Create a new project', value: 'create', hint: 'starter app + shared configs' },
+        { label: 'Add configs to this project', value: 'init', hint: 'existing project in the current folder' },
+        { label: 'Update this project', value: 'update', hint: 'pull the latest template release' },
+    ]);
+    if (action === 'create') {
+        positionals.push(await prompts.text('Project name', { initial: 'my-app', validate: validateName }));
+    } else {
+        positionals.push(action);
+    }
+    console.log();
+}
 
 const run = (command, args, options = {}) => {
     return spawnSync(command, args, { encoding: 'utf8', ...options });
@@ -193,13 +271,17 @@ if (command === 'update') {
     const detected = detect();
     const answers = {
         scope: 'configs',
-        stack: values.stack ?? detected.stack,
-        styling: values.styling ?? detected.styling,
+        stack: option('stack', values.stack, STACKS) ?? detected.stack,
+        styling: option('styling', values.styling, STYLINGS) ?? detected.styling,
         tailwind_stylesheet: detected.tailwind_stylesheet,
     };
+    if (!answers.stack) {
+        ui.warn('Stack not detected (no next or vite in package.json).');
+        answers.stack = await choose('stack', undefined, 'Framework', STACKS);
+    }
     ui.table([
         ['project', detected.name ?? '(unnamed)'],
-        ['stack', answers.stack ?? 'not detected, Copier will ask'],
+        ['stack', answers.stack],
         ['styling', answers.styling],
         ...(answers.tailwind_stylesheet ? [['stylesheet', answers.tailwind_stylesheet]] : []),
         ['template', source],
@@ -233,24 +315,40 @@ if (command === 'update') {
     if (existsSync(target) && readdirSync(target).length > 0) {
         fail(`${target} exists and is not empty. Pick a new directory, or run init inside an existing project.`);
     }
+    let name = toKebab(target);
+    if (validateName(name)) {
+        if (!prompts.interactive) {
+            fail(`Cannot derive a package name from "${target}". Use a kebab-case directory name.`);
+        }
+        name = await prompts.text('Package name', { validate: validateName });
+    }
+    const stack = await choose('stack', values.stack, 'Framework', STACKS);
+    // New Next.js apps ship CSS Modules only.
+    const styling =
+        stack === 'next'
+            ? (option('styling', values.styling, STYLINGS) ?? 'css-modules')
+            : await choose('styling', values.styling, 'Styling', STYLINGS);
     ui.table([
         ['directory', target],
-        ['stack', values.stack ?? 'Copier will ask'],
-        ['styling', values.styling ?? (values.stack === 'next' ? 'css-modules' : 'Copier will ask')],
+        ['name', name],
+        ['stack', stack],
+        ['styling', styling],
         ['template', source],
     ]);
 
     ui.step('Generating the project');
+    // Every answer is known, so Copier asks nothing (the title defaults from the name).
     copier([
         'copy',
         '--trust',
+        '--defaults',
         ...ref,
-        ...data({ scope: 'app', stack: values.stack, styling: values.styling }),
+        ...data({ scope: 'app', project_name: name, stack, styling }),
         values.template,
         target,
     ]);
     ui.box('Project created', [
-        `Open:    ${ui.code(`cd ${target}`)}`,
+        `Open:    ${ui.code(`cd ${/\s/.test(target) ? JSON.stringify(target) : target}`)}`,
         `Env:     ${ui.code('cp .env.local.example .env.local')}`,
         `Run:     ${ui.code('pnpm dev')}`,
         `Commit:  ${ui.code('git add -A && git commit -m "chore: scaffold from phenomenon-configs"')}`,

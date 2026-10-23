@@ -25,6 +25,12 @@ export const bold = (text) => {
 export const accent = (text) => {
     return paint('magenta', text);
 };
+export const success = (text) => {
+    return paint('green', text);
+};
+export const danger = (text) => {
+    return paint('red', text);
+};
 export const code = (text) => {
     return paint('cyan', text);
 };

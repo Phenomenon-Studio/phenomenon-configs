@@ -66,6 +66,10 @@ No npm token, GitHub token, `.npmrc` entry or org secret is needed. The CLI is o
 
 Run every command with `pnpm dlx`, so you always get the latest CLI and nothing gets installed globally. `npx @phenomenon-studio/create-app …` works too. Each command prints the same three numbered steps, runs Copier (its questions and file list appear in between) and ends with a summary box of next steps.
 
+### `create-app` (no arguments): interactive
+
+In a terminal, running the CLI without arguments asks what to do: **Create a new project**, **Add configs to this project** or **Update this project**. For a new project it then asks for the name and shows radio lists for the framework and styling (↑/↓ or the option number, Enter to pick). Without a terminal (CI, pipes) it prints help instead, so scripts must pass the command and flags.
+
 ### `create-app <directory>`: new project
 
 Generates a starter app (source, README, build config) plus all shared configs, installs dependencies, initialises git and husky.
@@ -74,11 +78,13 @@ Generates a starter app (source, README, build config) plus all shared configs, 
 pnpm dlx @phenomenon-studio/create-app my-app
 ```
 
-| Option                            | Effect                                                    |
-| --------------------------------- | --------------------------------------------------------- |
-| `--stack vite\|next`              | Skip the framework question                               |
-| `--styling tailwind\|css-modules` | Vite only: skip the styling question (default `tailwind`) |
-| `--ref vX.Y.Z`                    | Use a specific template release instead of the latest     |
+| Option                            | Effect                                                                |
+| --------------------------------- | --------------------------------------------------------------------- |
+| `--stack vite\|next`              | Skip the framework radio list                                         |
+| `--styling tailwind\|css-modules` | Vite only: skip the styling radio list (Next.js apps use CSS Modules) |
+| `--ref vX.Y.Z`                    | Use a specific template release instead of the latest                 |
+
+The package name comes from the directory name in kebab-case (`My App` → `my-app`). If it can't be derived, you're asked for it.
 
 What you see:
 
