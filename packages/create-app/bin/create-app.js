@@ -261,7 +261,7 @@ if (command === 'update') {
         `Review:   ${ui.code('git diff')}`,
         `Conflicts: ${ui.code("git grep -n '^<<<<<<< '")} ${ui.dim('(resolve, keep local intent)')}`,
         `Verify:   ${ui.code('pnpm lint && pnpm tsc && pnpm build')}`,
-        `Commit:   ${ui.code('git commit -am "chore(template): update"')}`,
+        `Commit:   ${ui.code('git commit -am "build(template): update"')}`,
     ]);
 } else if (command === 'init') {
     ui.step('Inspecting the existing project');
@@ -351,6 +351,6 @@ if (command === 'update') {
         `Open:    ${ui.code(`cd ${/\s/.test(target) ? JSON.stringify(target) : target}`)}`,
         `Env:     ${ui.code('cp .env.local.example .env.local')}`,
         `Run:     ${ui.code('pnpm dev')}`,
-        `Commit:  ${ui.code('git add -A && git commit -m "chore: scaffold from phenomenon-configs"')}`,
+        `Commit:  ${ui.code('git add -A && git commit -m "build: scaffold from phenomenon-configs"')}`,
     ]);
 }

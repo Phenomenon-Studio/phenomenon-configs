@@ -54,7 +54,7 @@ No npm token, GitHub token, `.npmrc` entry or org secret is needed. The CLI is o
                                     │
                                     ▼
           ┌──────────────── every template release (vX.Y.Z) ────────────────┐
-          │ weekly "chore(template): update to vX.Y.Z" PR opens by itself,   │
+          │ weekly "build(template): update to vX.Y.Z" PR opens by itself,   │
           │ or run `pnpm dlx @phenomenon-studio/create-app update` any time  │
           └──────────────────────────────────────────────────────────────────┘
                                     │
@@ -108,7 +108,7 @@ What you see:
   │ Open:    cd my-app                                                  │
   │ Env:     cp .env.local.example .env.local                           │
   │ Run:     pnpm dev                                                   │
-  │ Commit:  git add -A && git commit -m "chore: scaffold from phen…"   │
+  │ Commit:  git add -A && git commit -m "build: scaffold from phen…"   │
   ╰─────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -194,7 +194,7 @@ What you see:
   │ Review:   git diff                                        │
   │ Conflicts: git grep -n '^<<<<<<< '                        │
   │ Verify:   pnpm lint && pnpm tsc && pnpm build             │
-  │ Commit:   git commit -am "chore(template): update"        │
+  │ Commit:   git commit -am "build(template): update"        │
   ╰───────────────────────────────────────────────────────────╯
 ```
 
@@ -235,10 +235,10 @@ pnpm dlx @phenomenon-studio/create-app init --overwrite  # stylesheet for Tailwi
 **Bring a project up to date by hand (no waiting for Monday's PR)**
 
 ```bash
-git switch -c chore/template-update
+git switch -c build/template-update
 pnpm dlx @phenomenon-studio/create-app update
 git grep -n '^<<<<<<< ' || echo "no conflicts"
-pnpm lint && pnpm tsc && pnpm build && git commit -am "chore(template): update"
+pnpm lint && pnpm tsc && pnpm build && git commit -am "build(template): update"
 ```
 
 **Keep a project-specific rule through updates**

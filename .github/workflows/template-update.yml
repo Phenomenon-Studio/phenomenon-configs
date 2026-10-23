@@ -43,7 +43,7 @@ jobs:
             run:
                 working-directory: ${{ inputs.working-directory }}
         env:
-            BRANCH: chore/template-update
+            BRANCH: build/template-update
             # `secrets` can't be read in step conditions; this can.
             HAS_TOKEN: ${{ secrets.token != '' }}
         steps:
@@ -122,8 +122,8 @@ jobs:
               with:
                   token: ${{ secrets.token || github.token }}
                   branch: ${{ env.BRANCH }}
-                  commit-message: 'chore(template): update to ${{ steps.update.outputs.after }}'
-                  title: 'chore(template): update to ${{ steps.update.outputs.after }}'
+                  commit-message: 'build(template): update to ${{ steps.update.outputs.after }}'
+                  title: 'build(template): update to ${{ steps.update.outputs.after }}'
                   labels: platform
                   body-path: /tmp/pr-body.md
 

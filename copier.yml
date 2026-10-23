@@ -87,7 +87,7 @@ _message_after_copy: |
     Next steps:
       cd {{ _copier_conf.dst_path }}
       cp .env.local.example .env.local
-      git add -A && git commit -m "chore: scaffold from phenomenon-configs"
+      git add -A && git commit -m "build: scaffold from phenomenon-configs"
     {%- else %}
     Added the shared configs ({{ stack }}, {{ styling }}).
 

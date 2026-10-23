@@ -14,14 +14,14 @@ Config rule changes are template changes. They ship with a `vX.Y.Z` tag and reac
 ## CLI
 
 1. In the PR, run `pnpm changeset` and pick the bump type.
-2. On merge, `release.yml` opens or updates **chore(release): version packages**. That PR bumps the version and writes the changelog.
+2. On merge, `release.yml` opens or updates **build(release): version packages**. That PR bumps the version and writes the changelog.
 3. Merging that PR publishes to npmjs.com from CI through npm trusted publishing (GitHub OIDC). No npm token is stored. Never publish from a laptop, except the first publish.
 
 ## Template and workflows
 
 1. Merge template or workflow changes with regenerated `examples/`. CI enforces this.
 2. Actions → **Release template** → `vX.Y.Z`. The workflow validates that the version is greater than the last one, tags it, moves the `vX` branch and creates a GitHub release with generated notes.
-3. Projects get a **chore(template): update to vX.Y.Z** PR within a week (Monday 06:00 UTC), or sooner via `workflow_dispatch` / `pnpm dlx @phenomenon-studio/create-app update`.
+3. Projects get a **build(template): update to vX.Y.Z** PR within a week (Monday 06:00 UTC), or sooner via `workflow_dispatch` / `pnpm dlx @phenomenon-studio/create-app update`.
 
 ## Breaking changes
 
