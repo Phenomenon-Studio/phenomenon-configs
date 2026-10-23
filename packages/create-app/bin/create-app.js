@@ -212,7 +212,18 @@ const data = (answers) => {
 
 const copier = (args) => {
     console.log();
-    const result = spawnSync('uvx', ['--from', `copier==${COPIER_VERSION}`, 'copier', ...args], { stdio: 'inherit' });
+    const result = spawnSync('uvx', ['--from', `copier==${COPIER_VERSION}`, 'copier', ...args], {
+        stdio: 'inherit',
+        // Copier deletes its temp repo right after committing; git's background auto-gc there fails the cleanup.
+        env: {
+            ...process.env,
+            GIT_CONFIG_COUNT: '2',
+            GIT_CONFIG_KEY_0: 'gc.auto',
+            GIT_CONFIG_VALUE_0: '0',
+            GIT_CONFIG_KEY_1: 'maintenance.auto',
+            GIT_CONFIG_VALUE_1: 'false',
+        },
+    });
     console.log();
     if (result.status !== 0) {
         fail(`Copier exited with code ${result.status ?? 1}. Nothing above was committed; fix the error and rerun.`);
