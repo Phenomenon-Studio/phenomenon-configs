@@ -277,6 +277,7 @@ Keep project-specific changes under `// Local overrides only.` in each config so
 | `<<<<<<<` markers after update | Edit each file to keep both intents, remove the markers, rerun `pnpm lint` |
 | Template update PR fails to open | Turn on "Allow GitHub Actions to create and approve pull requests" in the repo or org settings |
 | `pnpm install` rejects a version as too new | The project enforces a 3-day `minimumReleaseAge`. Wait, or pin an older version |
+| `pnpm dlx` runs an older CLI version right after a release | pnpm skips versions younger than its `minimumReleaseAge` (3 days). Pin the version: `pnpm dlx @phenomenon-studio/create-app@1.0.2 …`, or use `npx @phenomenon-studio/create-app …` |
 
 ## What lives where
 
