@@ -10,8 +10,7 @@
         "directory": "packages/create-app"
     },
     "publishConfig": {
-        "access": "public",
-        "provenance": true
+        "access": "public"
     },
     "bin": {
         "create-app": "bin/create-app.js",
