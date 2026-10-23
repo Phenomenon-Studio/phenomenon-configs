@@ -1,5 +1,11 @@
 # @phenomenon-studio/create-app
 
+## 1.0.2
+
+### Patch Changes
+
+- [`9664942`](https://github.com/Phenomenon-Studio/phenomenon-configs/commit/9664942d719ea58880168b41f71460920fe3d644) Thanks [@m-kolomoyets](https://github.com/m-kolomoyets)! - Run Copier with git auto-gc off, so `update` no longer fails at random with "Directory not empty: '.git'". Next-step hints use `build(...)` commit types that pass the shared commitlint rules.
+
 ## 1.0.1
 
 ### Patch Changes
