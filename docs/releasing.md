@@ -6,7 +6,7 @@ The CLI and the template ship on separate lines.
 | --- | --- | --- | --- |
 | `@phenomenon-studio/create-app` (public, npmjs.com) | Changesets | `@phenomenon-studio/create-app@1.1.0` | nothing: run with `pnpm dlx` (latest) |
 | Copier template (configs, starter, catalog) | git tag | `v1.4.0` (Copier ignores other tags) | `_commit` in `.copier-answers.yml` |
-| Reusable workflows | same tag + moving major tag | `v1.4.0`, `v1` | `@v1` |
+| Reusable workflows | same tag + moving major **branch** (a tag would be read by Copier as a version) | `v1.4.0`, `v1` | `@v1` |
 | Renovate preset | default branch | — | always latest |
 
 Config rule changes are template changes. They ship with a `vX.Y.Z` tag and reach projects as a template update PR. No package needs publishing.
@@ -20,7 +20,7 @@ Config rule changes are template changes. They ship with a `vX.Y.Z` tag and reac
 ## Template and workflows
 
 1. Merge template or workflow changes with regenerated `examples/`. CI enforces this.
-2. Actions → **Release template** → `vX.Y.Z`. The workflow validates that the version is greater than the last one, tags it, moves `vX` and creates a GitHub release with generated notes.
+2. Actions → **Release template** → `vX.Y.Z`. The workflow validates that the version is greater than the last one, tags it, moves the `vX` branch and creates a GitHub release with generated notes.
 3. Projects get a **chore(template): update to vX.Y.Z** PR within a week (Monday 06:00 UTC), or sooner via `workflow_dispatch` / `pnpm dlx @phenomenon-studio/create-app update`.
 
 ## Breaking changes
@@ -29,7 +29,7 @@ Breaking changes go out as major bumps only.
 
 - Write the steps in [MIGRATIONS.md](../MIGRATIONS.md).
 - Template files renamed or removed: add a Copier `_migrations` entry in `copier.yml` so `copier update` handles them.
-- Workflow inputs changed incompatibly: release a new major tag (`v2`). The template's `.github/workflows/*.yml` must reference `@v2` in the same release. The update PR can't push workflow file changes with `GITHUB_TOKEN`, so it puts them in the PR body as a patch. Call that out in the release notes.
+- Workflow inputs changed incompatibly: release a new major (`v2` branch). The template's `.github/workflows/*.yml` must reference `@v2` in the same release. The update PR can't push workflow file changes with `GITHUB_TOKEN`, so it puts them in the PR body as a patch. Call that out in the release notes.
 - Rule changes: list every one in the PR description, never silently.
 
 ## First release checklist

@@ -1,5 +1,6 @@
-# Template + reusable workflows: tag vX.Y.Z, move the vX major tag, publish release notes.
-# Copier only sees PEP 440 tags (vX.Y.Z); package tags (@phenomenon-studio/x@1.2.3) are ignored by it.
+# Template + reusable workflows: tag vX.Y.Z, move the vX major branch, publish release notes.
+# The major ref is a branch, not a tag: Copier reads every PEP 440 tag, and a moving `v1` tag would be picked as the
+# template version (recorded as `_commit: v1`, which breaks `copier update`). `uses: …@v1` resolves branches too.
 name: Release template
 
 on:
@@ -30,7 +31,7 @@ jobs:
                   if [ -n "$latest" ] && [ "$(printf '%s\n%s\n' "$latest" "$VERSION" | sort -V | tail -1)" != "$VERSION" ]; then
                       echo "::error::$VERSION is not greater than $latest"; exit 1
                   fi
-            - name: Tag and move major tag
+            - name: Tag and move major branch
               env:
                   VERSION: ${{ inputs.version }}
               run: |
@@ -38,9 +39,8 @@ jobs:
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
                   git tag -a "$VERSION" -m "$VERSION"
-                  git tag -fa "$major" -m "$major → $VERSION"
                   git push origin "$VERSION"
-                  git push --force origin "$major"
+                  git push --force origin "$VERSION^{commit}:refs/heads/$major"
             - name: GitHub release
               env:
                   GH_TOKEN: ${{ github.token }}

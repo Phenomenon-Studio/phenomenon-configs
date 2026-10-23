@@ -14,8 +14,8 @@
         "provenance": true
     },
     "bin": {
-        "create-app": "./bin/create-app.js",
-        "phenomenon-configs": "./bin/create-app.js"
+        "create-app": "bin/create-app.js",
+        "phenomenon-configs": "bin/create-app.js"
     },
     "files": [
         "bin"

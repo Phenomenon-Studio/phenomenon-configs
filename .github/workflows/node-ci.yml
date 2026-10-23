@@ -1,5 +1,5 @@
 # Reusable CI for Phenomenon Studio projects. Projects call it from .github/workflows/ci.yml (rendered by the
-# template) and pin a major tag: `uses: Phenomenon-Studio/phenomenon-configs/.github/workflows/node-ci.yml@v1`.
+# template) and pin the major branch: `uses: Phenomenon-Studio/phenomenon-configs/.github/workflows/node-ci.yml@v1`.
 name: Node CI
 
 on:
