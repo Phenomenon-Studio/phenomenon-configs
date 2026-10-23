@@ -17,6 +17,8 @@
         "skipLibCheck": true,
         "noEmit": true,
         "allowJs": true,
+        // Required by `next build` (it rewrites tsconfig.json to add it otherwise).
+        "esModuleInterop": true,
         "incremental": true,
         "plugins": [{ "name": "next" }],
 
