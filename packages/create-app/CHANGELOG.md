@@ -1,5 +1,11 @@
 # @phenomenon-studio/create-app
 
+## 1.1.0
+
+### Minor Changes
+
+- [`9fbb03f`](https://github.com/Phenomenon-Studio/phenomenon-configs/commit/9fbb03faccb8f6c8827ef4797ddbd821aceb6a0d) Thanks [@m-kolomoyets](https://github.com/m-kolomoyets)! - `update` runs Copier with `--skip-tasks` (the update steps now run as template migrations), which fixes updates of projects adopted with `init`. `create` and `init` fail loudly if Copier did not write `.copier-answers.yml`.
+
 ## 1.0.2
 
 ### Patch Changes
