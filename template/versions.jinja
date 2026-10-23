@@ -3,7 +3,6 @@
 
     - package.json, .nvmrc, `packageManager`, CI workflows and every other rendered file read versions from here.
     - Renovate keeps this file current (custom managers in /renovate.json): one line = one dependency.
-    - `@phenomenon-studio/*` versions are written by `pnpm template:sync-versions` on every package release.
     - Existing projects receive changes through `copier update` (template update PR) or their own Renovate.
 
     Keep it valid JSON between the `set` delimiters (scripts parse it), one `"name": "version"` pair per line.
@@ -13,25 +12,27 @@
         "node": "24",
         "pnpm": "11.9.0"
     },
-    "platform": {
-        "@phenomenon-studio/commitlint-config": "1.0.0",
-        "@phenomenon-studio/eslint-config": "1.0.0",
-        "@phenomenon-studio/prettier-config": "1.0.0",
-        "@phenomenon-studio/stylelint-config": "1.0.0",
-        "@phenomenon-studio/tsconfig": "1.0.0"
-    },
     "npm": {
         "@babel/core": "8.0.6",
         "@base-ui/react": "1.8.0",
         "@casl/ability": "7.0.1",
         "@casl/react": "7.0.1",
         "@commitlint/cli": "21.2.3",
+        "@commitlint/config-conventional": "21.2.3",
+        "@commitlint/types": "21.2.3",
+        "@eslint-react/eslint-plugin": "5.26.1",
+        "@eslint/js": "10.0.1",
+        "@ianvs/prettier-plugin-sort-imports": "4.7.1",
         "@next/bundle-analyzer": "16.4.0",
+        "@next/eslint-plugin-next": "16.4.0",
         "@react-hookz/web": "26.1.0",
         "@rolldown/plugin-babel": "0.2.4",
+        "@stylistic/eslint-plugin": "5.10.0",
         "@svgr/webpack": "8.1.0",
         "@t3-oss/env-nextjs": "0.13.11",
         "@tailwindcss/vite": "4.3.3",
+        "@tanstack/eslint-plugin-query": "5.104.2",
+        "@tanstack/eslint-plugin-router": "1.162.0",
         "@tanstack/react-form": "1.33.5",
         "@tanstack/react-query": "5.104.0",
         "@tanstack/react-query-devtools": "5.104.0",
@@ -50,6 +51,11 @@
         "cn": "0.4.0",
         "cookies-next": "6.1.1",
         "eslint": "10.11.0",
+        "eslint-config-prettier": "10.1.8",
+        "eslint-plugin-jsx-a11y-x": "0.2.0",
+        "eslint-plugin-prettier": "5.5.6",
+        "eslint-plugin-react-hooks": "7.1.1",
+        "globals": "17.13.0",
         "husky": "9.1.7",
         "knip": "6.39.0",
         "ky": "2.1.0",
@@ -60,20 +66,23 @@
         "nuqs": "2.10.2",
         "postcss": "8.5.29",
         "prettier": "3.9.9",
+        "prettier-plugin-tailwindcss": "0.8.1",
         "react": "19.3.0",
         "react-dom": "19.3.0",
         "react-error-boundary": "6.1.6",
         "rollup-plugin-visualizer": "7.1.1",
         "shadcn": "4.21.1",
         "stylelint": "17.16.0",
+        "stylelint-config-standard": "40.0.0",
         "tailwindcss": "4.3.3",
         "tw-animate-css": "1.4.0",
         "typescript": "6.0.3",
+        "typescript-eslint": "8.71.1",
         "vite": "8.3.2",
         "vite-plugin-html": "3.2.2",
         "zod": "4.6.5"
     }
 } -%}
 {%- macro dep(name, last=False) -%}
-"{{ name }}": "{{ versions.platform[name] if name in versions.platform else versions.npm[name] }}"{{ '' if last else ',' }}
+"{{ name }}": "{{ versions.npm[name] }}"{{ '' if last else ',' }}
 {%- endmacro -%}

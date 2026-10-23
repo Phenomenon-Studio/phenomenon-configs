@@ -94,14 +94,14 @@
 
 This project was generated from [phenomenon-configs](https://github.com/Phenomenon-Studio/phenomenon-configs).
 
-- ESLint, TypeScript, Prettier, Stylelint and commitlint configs extend `@phenomenon-studio/*` packages. Add only
-  project-specific overrides locally. Rule changes arrive as a grouped Renovate PR.
+- ESLint, TypeScript, Prettier, Stylelint and commitlint configs are plain files in this repo, with no shared config
+  package to install. Add project-specific rules under `// Local overrides only.` so template updates merge cleanly.
 - CI runs the shared `node-ci.yml@v1` workflow ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
-- Template files (this README, hooks, `.gitignore`, build configs…) are updated by a weekly **Template update** PR,
-  or by hand with `pnpm dlx @phenomenon-studio/create-app update`. Keep `.copier-answers.yml` committed and never
-  edit it by hand.
-- Installing `@phenomenon-studio/*` packages needs a GitHub token with `read:packages`:
-  `echo "//npm.pkg.github.com/:_authToken=$(gh auth token)" >> ~/.npmrc`.
+- Config rules and template files (this README, hooks, `.gitignore`, build configs…) are updated by a weekly
+  **Template update** PR, or by hand with `pnpm dlx @phenomenon-studio/create-app update`. Keep `.copier-answers.yml`
+  committed and never edit it by hand.
+- Nothing needs a token: the template and the CLI are public. For the update PR, allow Actions to open PRs (Settings →
+  Actions → General → "Allow GitHub Actions to create and approve pull requests").
 
 ## 🧶 Structure
 
@@ -218,7 +218,7 @@ This project was generated from [phenomenon-configs](https://github.com/Phenomen
 - `eslint.config.js` - ESLint configuration for JavaScript/TypeScript linting;
 - `prettier.config.js` - Prettier configuration for code formatting;
 - `.prettierignore` - files and directories to ignore during Prettier formatting;
-- `stylelint.config.js` - Stylelint configuration for CSS linting (extends `@phenomenon-studio/stylelint-config`);
+- `stylelint.config.js` - Stylelint configuration for CSS linting;
 
 #### Git and development configuration
 

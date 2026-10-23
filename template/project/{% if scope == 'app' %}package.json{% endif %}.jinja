@@ -1,0 +1,127 @@
+{% from 'template/versions.jinja' import versions, dep with context -%}
+{% from 'template/tooling.jinja' import tooling_dev_dependencies, tooling_scripts with context -%}
+{%- macro dev_dependencies(names) -%}
+{%- for name in (names + tooling_dev_dependencies) | unique | sort %}
+        "{{ name }}": "{{ versions.npm[name] }}"{{ '' if loop.last else ',' }}
+{%- endfor %}
+{%- endmacro -%}
+{
+    "name": "{{ project_name }}",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "packageManager": "pnpm@{{ versions.runtime.pnpm }}",
+    "engines": {
+        "node": ">={{ versions.runtime.node }}",
+        "pnpm": ">={{ versions.runtime.pnpm.split('.')[0] }}",
+        "npm": "please-use-pnpm",
+        "yarn": "please-use-pnpm"
+    },
+    "scripts": {
+{%- if stack == 'vite' %}
+        "dev:vite": "vite --host",
+        "dev:vite:scan": "vite --host --mode scan",
+        "dev:tsc": "tsc --build --watch",
+        "dev": "pnpm run --parallel \"/^dev:(vite|tsc)$/\"",
+        "dev:scan": "pnpm run --parallel dev:vite:scan dev:tsc",
+        "build": "vite build",
+        "preview": "vite preview --host",
+        "knip": "knip",
+{%- elif stack == 'next' %}
+        "dev": "next dev --turbopack --experimental-https",
+        "dev:scan": "APP_MODE=scan next dev --turbopack --experimental-https",
+        "build": "next build",
+        "build:analyze": "ANALYZE=true next build",
+        "start": "next start -p 4173",
+{%- endif %}
+{%- for name in tooling_scripts %}
+        "{{ name }}": "{{ tooling_scripts[name] | replace('"', '\\"') }}"{{ '' if loop.last else ',' }}
+{%- endfor %}
+    },
+{%- if stack == 'vite' %}
+    "msw": {
+        "workerDirectory": [
+            "public"
+        ]
+    },
+    "dependencies": {
+        {{ dep('@base-ui/react') }}
+        {{ dep('@casl/ability') }}
+        {{ dep('@casl/react') }}
+        {{ dep('@react-hookz/web') }}
+        {{ dep('@tanstack/react-form') }}
+        {{ dep('@tanstack/react-query') }}
+        {{ dep('@tanstack/react-router') }}
+{%- if styling == 'tailwind' %}
+        {{ dep('class-variance-authority') }}
+        {{ dep('cn') }}
+{%- else %}
+        {{ dep('clsx') }}
+{%- endif %}
+        {{ dep('ky') }}
+        {{ dep('lucide-react') }}
+        {{ dep('react') }}
+        {{ dep('react-dom') }}
+        {{ dep('react-error-boundary') }}
+        {{ dep('zod', last=True) }}
+    },
+    "devDependencies": {
+{%- set dev = [
+    '@babel/core',
+    '@rolldown/plugin-babel',
+    '@tanstack/react-query-devtools',
+    '@tanstack/react-router-devtools',
+    '@tanstack/router-plugin',
+    '@types/babel__core',
+    '@types/react',
+    '@types/react-dom',
+    '@vitejs/plugin-react',
+    'babel-plugin-react-compiler',
+    'knip',
+    'msw',
+    'rollup-plugin-visualizer',
+    'vite',
+    'vite-plugin-html',
+] + (['@tailwindcss/vite', 'shadcn', 'tailwindcss', 'tw-animate-css'] if styling == 'tailwind' else []) %}
+{{- dev_dependencies(dev) }}
+    }
+{%- elif stack == 'next' %}
+    "browserslist": [
+        "> 0.3%",
+        "not dead",
+        "Firefox >= 113",
+        "Chrome >= 111",
+        "Edge >= 111",
+        "Safari >= 16.4",
+        "ios_saf >= 16.4"
+    ],
+    "dependencies": {
+        {{ dep('@react-hookz/web') }}
+        {{ dep('@t3-oss/env-nextjs') }}
+        {{ dep('@tanstack/react-query') }}
+        {{ dep('clsx') }}
+        {{ dep('cookies-next') }}
+        {{ dep('ky') }}
+        {{ dep('next') }}
+        {{ dep('nextjs-toploader') }}
+        {{ dep('nuqs') }}
+        {{ dep('react') }}
+        {{ dep('react-dom') }}
+        {{ dep('react-error-boundary') }}
+        {{ dep('zod', last=True) }}
+    },
+    "devDependencies": {
+{%- set dev = [
+    '@next/bundle-analyzer',
+    '@svgr/webpack',
+    '@tanstack/react-query-devtools',
+    '@types/react',
+    '@types/react-dom',
+    'autoprefixer',
+    'babel-plugin-react-compiler',
+    'postcss',
+] %}
+{{- dev_dependencies(dev) }}
+    }
+{%- endif %}
+}

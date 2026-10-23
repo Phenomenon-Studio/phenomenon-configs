@@ -1,6 +1,32 @@
 {
-    "extends": "@phenomenon-studio/tsconfig/node.json",
+    "$schema": "https://json.schemastore.org/tsconfig",
     "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "moduleDetection": "force",
+        "resolveJsonModule": true,
+        "allowImportingTsExtensions": true,
+        "verbatimModuleSyntax": true,
+        "isolatedModules": true,
+        "skipLibCheck": true,
+        "noEmit": true,
+
+        /* Node tooling (config files, scripts) */
+        "target": "ES2025",
+        "lib": ["ES2025", "ESNext.Array", "ESNext.Error"],
+        "types": ["node"],
+        "allowJs": true,
+        "checkJs": true,
+
+        /* Linting */
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "erasableSyntaxOnly": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedSideEffectImports": true,
+
+        /* Project */
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo"
     },
     "include": [

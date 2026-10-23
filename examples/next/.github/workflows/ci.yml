@@ -4,6 +4,8 @@ on:
     push:
         branches: [main]
     pull_request:
+    # Started by the template update job on its PR branch.
+    workflow_dispatch:
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,4 +19,3 @@ jobs:
             # Public env vars validated at build time (src/lib/env.ts). Replace with your project's values.
             build-env: |
                 NEXT_PUBLIC_API_URL=https://example.com
-        secrets: inherit

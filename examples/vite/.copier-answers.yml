@@ -2,5 +2,6 @@
 _src_path: gh:Phenomenon-Studio/phenomenon-configs
 project_name: example-vite
 project_title: Example Vite
+scope: app
 stack: vite
 styling: tailwind

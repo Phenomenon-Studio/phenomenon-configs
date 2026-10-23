@@ -1,0 +1,67 @@
+{#-
+    Tooling every project gets, in both scopes: the devDependencies and package.json scripts the shared configs
+    (eslint.config.js, prettier.config.js, stylelint.config.js, commitlint.config.js, tsconfig*, husky) need.
+
+    - scope=app: package.json.jinja renders these next to the app's own dependencies and scripts.
+    - scope=configs: template/tasks/sync-package-json.js merges them into the existing package.json.
+
+    Groups: "*" = always, then one per `stack` and one per `styling` value. Versions come from versions.jinja.
+    Keep it valid JSON between the `set` delimiters (scripts parse it).
+-#}
+{%- set tooling = {
+    "devDependencies": {
+        "*": [
+            "@commitlint/cli",
+            "@commitlint/config-conventional",
+            "@commitlint/types",
+            "@eslint-react/eslint-plugin",
+            "@eslint/js",
+            "@ianvs/prettier-plugin-sort-imports",
+            "@stylistic/eslint-plugin",
+            "@tanstack/eslint-plugin-query",
+            "@types/node",
+            "eslint",
+            "eslint-config-prettier",
+            "eslint-plugin-jsx-a11y-x",
+            "eslint-plugin-prettier",
+            "eslint-plugin-react-hooks",
+            "globals",
+            "husky",
+            "prettier",
+            "stylelint",
+            "stylelint-config-standard",
+            "typescript",
+            "typescript-eslint"
+        ],
+        "vite": ["@tanstack/eslint-plugin-router"],
+        "next": ["@next/eslint-plugin-next"],
+        "tailwind": ["prettier-plugin-tailwindcss"],
+        "css-modules": []
+    },
+    "scripts": {
+        "vite": {
+            "tsc": "tsc --build",
+            "lint:eslint": "eslint --cache --max-warnings 0 --report-unused-disable-directives \"**/*.{js,ts,tsx,cjs,mjs}\""
+        },
+        "next": {
+            "tsc": "next typegen && tsc",
+            "lint:eslint": "eslint --cache --max-warnings 0 --report-unused-disable-directives ."
+        },
+        "*": {
+            "lint:stylelint": "stylelint --cache -q --allow-empty-input \"**/*.css\"",
+            "lint:fmt": "prettier --check \"**/*.{js,ts,tsx,json,html,css,cjs,mjs}\"",
+            "lint": "pnpm run \"/^lint:.*/\"",
+            "fix:fmt": "prettier --write \"**/*.{js,ts,tsx,json,html,css,cjs,mjs}\"",
+            "prepare": "husky"
+        },
+        "tailwind": {},
+        "css-modules": {}
+    }
+} -%}
+{%- set tooling_groups = [stack, '*', styling] -%}
+{%- set tooling_dev_dependencies = [] -%}
+{%- set tooling_scripts = {} -%}
+{%- for group in tooling_groups -%}
+    {%- for name in tooling.devDependencies[group] -%}{%- set _ = tooling_dev_dependencies.append(name) -%}{%- endfor -%}
+    {%- set _ = tooling_scripts.update(tooling.scripts[group]) -%}
+{%- endfor -%}

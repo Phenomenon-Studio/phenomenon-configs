@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { appendFileSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { copier, root } from './lib.js';
@@ -52,17 +52,6 @@ if (conflicts.status === 0) {
     throw new Error(`copier update ${lastTag} -> HEAD left conflicts in:\n${conflicts.stdout}`);
 }
 console.log(readFileSync(join(project, '.copier-answers.yml'), 'utf8'));
-
-// Use this checkout's config packages (they may be unreleased in a "Version packages" PR); everything else installs
-// from the public registry like a consumer would.
-const overrides = readdirSync(join(root, 'packages'))
-    .map((dir) => {
-        const { name } = JSON.parse(readFileSync(join(root, 'packages', dir, 'package.json'), 'utf8'));
-
-        return `  '${name}': link:${join(root, 'packages', dir)}\n`;
-    })
-    .join('');
-appendFileSync(join(project, 'pnpm-workspace.yaml'), `overrides:\n${overrides}`);
 
 for (const args of [['install', '--no-frozen-lockfile'], ['lint'], ['tsc'], ['build']]) {
     execFileSync('pnpm', args, { cwd: project, stdio: 'inherit', env: { ...process.env, NEXT_WORKSPACE_ROOT: '/' } });

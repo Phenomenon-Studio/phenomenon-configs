@@ -39,20 +39,9 @@
     ],
     "packageRules": [
         {
-            "description": "@phenomenon-studio versions in the catalog are written by `pnpm template:sync-versions` on release",
-            "matchFileNames": ["template/versions.jinja"],
-            "matchPackageNames": ["@phenomenon-studio/**"],
-            "enabled": false
-        },
-        {
             "description": "Catalog bumps reach every new project and every `copier update`: label for review",
             "matchFileNames": ["template/versions.jinja"],
             "labels": ["dependencies", "template"]
-        },
-        {
-            "description": "Config package peers stay wide; only widen, never narrow",
-            "matchDepTypes": ["peerDependencies"],
-            "rangeStrategy": "widen"
         }
     ]
 }

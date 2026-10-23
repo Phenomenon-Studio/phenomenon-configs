@@ -13,29 +13,30 @@
         "typecheck": "turbo run typecheck",
         "test": "turbo run test",
         "check": "NEXT_WORKSPACE_ROOT=$PWD turbo run lint typecheck test build",
-        "lint:root": "eslint --cache --max-warnings 0 \"*.js\" \"scripts/**/*.js\" \"packages/**/*.js\" && prettier --check \"*.{js,json,md,yml}\" \"{scripts,packages,renovate,docs,.github,.changeset}/**/*.{js,json,md,yml}\"",
-        "fix:fmt": "prettier --write \"*.{js,json,md,yml}\" \"{scripts,packages,renovate,docs,.github,.changeset}/**/*.{js,json,md,yml}\"",
+        "lint:root": "eslint --cache --max-warnings 0 \"*.js\" \"scripts/**/*.js\" \"packages/**/*.js\" \"template/tasks/**/*.js\" && prettier --check \"*.{js,json,md,yml}\" \"{scripts,packages,renovate,docs,.github,.changeset,template/tasks}/**/*.{js,json,md,yml}\"",
+        "fix:fmt": "prettier --write \"*.{js,json,md,yml}\" \"{scripts,packages,renovate,docs,.github,.changeset,template/tasks}/**/*.{js,json,md,yml}\"",
         "examples:regen": "node scripts/regen-examples.js",
-        "template:sync-versions": "node scripts/sync-template-versions.js",
         "template:update-test": "node scripts/template-update-test.js",
         "changeset": "changeset",
-        "version-packages": "changeset version && node scripts/sync-template-versions.js && node scripts/regen-examples.js && pnpm install --no-frozen-lockfile",
-        "release-packages": "changeset publish",
-        "prepare": "husky"
+        "version-packages": "changeset version && pnpm install --no-frozen-lockfile",
+        "release-packages": "node scripts/publish.js",
+        "prepare": "husky",
+        "template:configs-test": "node scripts/configs-mode-test.js",
+        "deps:outdated": "pnpm outdated --recursive --include-workspace-root",
+        "deps:update": "pnpm update --interactive --latest --recursive --include-workspace-root && pnpm deps:sync",
+        "deps:sync": "node scripts/catalog-from-examples.js && pnpm examples:regen && pnpm install --no-frozen-lockfile"
     },
     "devDependencies": {
         "@changesets/changelog-github": "0.7.0",
         "@changesets/cli": "2.31.1",
         "@commitlint/cli": "21.2.3",
-        "@phenomenon-studio/commitlint-config": "workspace:*",
-        "@phenomenon-studio/eslint-config": "workspace:*",
-        "@phenomenon-studio/prettier-config": "workspace:*",
+        "@commitlint/config-conventional": "21.2.3",
+        "@ianvs/prettier-plugin-sort-imports": "4.7.1",
         "eslint": "10.12.0",
         "husky": "9.1.7",
         "prettier": "3.9.10",
         "turbo": "2.11.7",
         "typescript": "6.0.3",
         "yaml": "2.9.1"
-    },
-    "prettier": "@phenomenon-studio/prettier-config"
+    }
 }

@@ -1,5 +1,7 @@
 # M0 audit: existing templates
 
+> **Superseded on 2026-10-23:** the `@phenomenon-studio/*` config packages were folded into the template. Their rules now render as plain config files in each project (`eslint.config.js`, `tsconfig*.json`, …), and only the public `@phenomenon-studio/create-app` CLI is published, to npmjs.com. The rule decisions below still hold. Read "package" as "template config file".
+
 Audited on 2026-10-15:
 
 - [`admin-template`](https://github.com/Phenomenon-Studio/admin-template) at `b02107f` → **vite**

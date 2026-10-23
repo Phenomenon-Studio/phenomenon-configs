@@ -5,10 +5,14 @@ on:
         - cron: '0 6 * * 1'
     workflow_dispatch:
 
+permissions:
+    contents: write
+    pull-requests: write
+    actions: write
+
 jobs:
     update:
-        # Opens a PR when phenomenon-configs has a newer template release than .copier-answers.yml records.
+        # Opens a PR when phenomenon-configs has a newer template release than .copier-answers.yml records. Uses this
+        # repo's GITHUB_TOKEN, no secrets: allow it under Settings → Actions → General → "Allow GitHub Actions to
+        # create and approve pull requests".
         uses: Phenomenon-Studio/phenomenon-configs/.github/workflows/template-update.yml@v1
-        secrets:
-            # Org secret: a token that can read Phenomenon-Studio/phenomenon-configs and open PRs here.
-            TEMPLATE_TOKEN: ${{ secrets.PLATFORM_TEMPLATE_TOKEN }}

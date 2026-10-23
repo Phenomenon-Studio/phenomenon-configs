@@ -1,6 +1,14 @@
 # Reusable "template update" job: runs `copier update` against the latest template release and opens a PR when the
 # project is behind. Projects call it on a schedule from .github/workflows/template-update.yml (rendered by the
 # template), so template changes arrive the same way as Renovate's dependency PRs.
+#
+# No secrets needed: the template repo and npm packages are public, and the PR is opened with the job's GITHUB_TOKEN.
+# The project repo (or org) must allow it: Settings → Actions → General → "Allow GitHub Actions to create and approve
+# pull requests". Two GITHUB_TOKEN limits are handled here:
+# - PRs it opens don't trigger `pull_request` workflows, so CI is started on the branch with `workflow_dispatch`.
+# - It can't push changes to .github/workflows/*. Those changes are left out of the commit and put in the PR body as
+#   a patch to apply by hand. Pass the optional `token` secret (contents, pull requests and workflows write) to
+#   commit them instead.
 name: Template update
 
 on:
@@ -9,22 +17,23 @@ on:
             working-directory:
                 type: string
                 default: .
+            ci-workflow:
+                description: Workflow file started on the update branch (needs a `workflow_dispatch` trigger). Empty = none
+                type: string
+                default: ci.yml
             copier-version:
                 type: string
                 # renovate: datasource=pypi depName=copier
                 default: '9.19.1'
         secrets:
-            TEMPLATE_TOKEN:
-                description: Token that can read Phenomenon-Studio/phenomenon-configs (private repo) and push PR branches
-                required: true
-            NPM_TOKEN:
-                description: Token with read:packages for @phenomenon-studio packages. Defaults to GITHUB_TOKEN.
+            token:
+                description: Optional. Token that may also push workflow file changes. Defaults to GITHUB_TOKEN.
                 required: false
 
 permissions:
     contents: write
     pull-requests: write
-    packages: read
+    actions: write
 
 jobs:
     update:
@@ -34,11 +43,14 @@ jobs:
             run:
                 working-directory: ${{ inputs.working-directory }}
         env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN || github.token }}
+            BRANCH: chore/template-update
+            # `secrets` can't be read in step conditions; this can.
+            HAS_TOKEN: ${{ secrets.token != '' }}
         steps:
             - uses: actions/checkout@v7
               with:
                   fetch-depth: 0
+                  token: ${{ secrets.token || github.token }}
 
             - uses: astral-sh/setup-uv@v10
 
@@ -49,14 +61,8 @@ jobs:
             - uses: actions/setup-node@v7
               with:
                   node-version-file: ${{ inputs.working-directory }}/.nvmrc
-                  registry-url: https://npm.pkg.github.com
-                  scope: '@phenomenon-studio'
 
-            - name: Authenticate template access
-              env:
-                  TOKEN: ${{ secrets.TEMPLATE_TOKEN }}
-              run: git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
-
+            # Copier tasks run too: they merge tooling into package.json (scope=configs) and refresh the lockfile.
             - name: Copier update
               id: update
               run: |
@@ -64,7 +70,7 @@ jobs:
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
                   uvx --from "copier==${{ inputs.copier-version }}" copier update \
-                      --trust --defaults --skip-answered --skip-tasks --conflict inline
+                      --trust --defaults --skip-answered --conflict inline
                   after=$(grep '^_commit:' .copier-answers.yml | cut -d' ' -f2)
                   echo "before=$before" >> "$GITHUB_OUTPUT"
                   echo "after=$after" >> "$GITHUB_OUTPUT"
@@ -72,22 +78,60 @@ jobs:
                       echo "conflicts=true" >> "$GITHUB_OUTPUT"
                   fi
 
-            - name: Refresh lockfile
+            - name: Hold back workflow file changes
+              if: steps.update.outputs.before != steps.update.outputs.after && env.HAS_TOKEN != 'true'
+              working-directory: .
+              run: |
+                  git add -N -- .github/workflows
+                  git diff -- .github/workflows > /tmp/workflows.patch
+                  git reset -q -- .github/workflows
+                  git checkout -q -- .github/workflows 2>/dev/null || true
+                  git clean -fdq -- .github/workflows
+
+            - name: PR body
               if: steps.update.outputs.before != steps.update.outputs.after
-              run: pnpm install --no-frozen-lockfile --ignore-scripts
+              env:
+                  BEFORE: ${{ steps.update.outputs.before }}
+                  AFTER: ${{ steps.update.outputs.after }}
+                  CONFLICTS: ${{ steps.update.outputs.conflicts }}
+              run: |
+                  {
+                      echo "Template update \`$BEFORE\` → \`$AFTER\`"
+                      echo "from [phenomenon-configs](https://github.com/Phenomenon-Studio/phenomenon-configs/releases/tag/$AFTER)."
+                      echo
+                      if [ "$CONFLICTS" = true ]; then
+                          echo '**Conflicts:** some files contain `<<<<<<<` markers where local edits overlap template changes. Resolve them on this branch before merging.'
+                      else
+                          echo 'Merged cleanly.'
+                      fi
+                      if [ -s /tmp/workflows.patch ]; then
+                          echo
+                          echo '**Workflow files:** the job token cannot push changes to `.github/workflows`. Apply this patch on this branch before merging (`git apply`), or the project keeps the old workflows:'
+                          echo
+                          echo '```diff'
+                          cat /tmp/workflows.patch
+                          echo '```'
+                      fi
+                      echo
+                      echo 'Read the release notes and MIGRATIONS.md for manual steps.'
+                  } > /tmp/pr-body.md
 
             - uses: peter-evans/create-pull-request@v8
+              id: pr
               if: steps.update.outputs.before != steps.update.outputs.after
               with:
-                  token: ${{ secrets.TEMPLATE_TOKEN }}
-                  branch: chore/template-update
+                  token: ${{ secrets.token || github.token }}
+                  branch: ${{ env.BRANCH }}
                   commit-message: 'chore(template): update to ${{ steps.update.outputs.after }}'
                   title: 'chore(template): update to ${{ steps.update.outputs.after }}'
                   labels: platform
-                  body: |
-                      Template update `${{ steps.update.outputs.before }}` → `${{ steps.update.outputs.after }}`
-                      from [phenomenon-configs](https://github.com/Phenomenon-Studio/phenomenon-configs/releases/tag/${{ steps.update.outputs.after }}).
+                  body-path: /tmp/pr-body.md
 
-                      ${{ steps.update.outputs.conflicts == 'true' && '**Conflicts:** some files contain `<<<<<<<` markers where local edits overlap template changes. Resolve them on this branch before merging.' || 'Merged cleanly.' }}
-
-                      Read the release notes and MIGRATIONS.md for manual steps.
+            # PRs opened with GITHUB_TOKEN don't trigger `pull_request` workflows; `workflow_dispatch` is allowed and its
+            # checks show on the PR's head commit.
+            - name: Start CI on the update branch
+              if: >-
+                  inputs.ci-workflow != '' && env.HAS_TOKEN != 'true' && (steps.pr.outputs.pull-request-operation == 'created' || steps.pr.outputs.pull-request-operation == 'updated')
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: gh workflow run "${{ inputs.ci-workflow }}" --ref "$BRANCH"

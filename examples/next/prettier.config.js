@@ -1,1 +1,63 @@
-export { default } from '@phenomenon-studio/prettier-config';
+// Shared options come from the phenomenon-configs template and update with `copier update`. Add project-specific
+// changes under "Local overrides" at the end, so template updates merge cleanly.
+
+/** @type {import("prettier").Config} */
+export default {
+    printWidth: 120,
+    proseWrap: 'never',
+    arrowParens: 'always',
+    endOfLine: 'lf',
+    trailingComma: 'es5',
+    tabWidth: 4,
+    singleQuote: true,
+    overrides: [
+        {
+            files: ['**/*.css', '**/*.html', '**/*.svg'],
+            options: {
+                singleQuote: false,
+            },
+        },
+    ],
+    plugins: ['@ianvs/prettier-plugin-sort-imports'],
+    // One order for every stack; framework-specific groups (`next`, `@/providers`, `@/context`, `@/icons`) are no-ops
+    // where a project has no such imports.
+    importOrder: [
+        '<TYPES>(react)',
+        '<TYPES>(next)',
+        '<TYPES>',
+        '<TYPES>^@/',
+        '<TYPES>^[./]',
+        '^react$',
+        '^react-dom',
+        '^next',
+        '<BUILTIN_MODULES>',
+        '<THIRD_PARTY_MODULES>',
+        '^@/lib',
+        '^(@/lib/constants|@/lib/schemas|@/lib/regexps|@/lib/utils)(/.*)$',
+        '^(@/hooks|@/context|@/providers)(/.*)$',
+        '^@/services',
+        '^@/modules',
+        '^@/components',
+        '^@/components/layouts',
+        '^@/components/ui',
+        '^@/icons',
+        '^[./].*/lib',
+        '^[./].*/constants',
+        '^[./].*/schemas',
+        '^[./].*/regexps',
+        '^[./].*/regexes',
+        '^[./].*/api',
+        '^[./].*/utils',
+        '^[./].*/context',
+        '^[./].*/providers',
+        '^[./].*/hooks',
+        '^[./].*/components',
+        '^[./].*/components/layouts',
+        '^[./]',
+        '\\.css$',
+        '^[./].*/public/',
+    ],
+    importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
+    importOrderTypeScriptVersion: '5.0.0',
+    // Local overrides only.
+};

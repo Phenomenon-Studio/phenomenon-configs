@@ -2,5 +2,6 @@
 _src_path: gh:Phenomenon-Studio/phenomenon-configs
 project_name: example-vite-css-modules
 project_title: Example Vite CSS Modules
+scope: app
 stack: vite
 styling: css-modules

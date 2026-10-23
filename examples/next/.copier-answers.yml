@@ -2,4 +2,5 @@
 _src_path: gh:Phenomenon-Studio/phenomenon-configs
 project_name: example-next
 project_title: Example Next
+scope: app
 stack: next

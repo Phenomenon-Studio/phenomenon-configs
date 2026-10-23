@@ -20,14 +20,10 @@ on:
             run-build:
                 type: boolean
                 default: true
-        secrets:
-            NPM_TOKEN:
-                description: Token with read:packages for @phenomenon-studio packages. Defaults to GITHUB_TOKEN.
-                required: false
 
+# Everything installs from the public npm registry: no tokens or secrets needed.
 permissions:
     contents: read
-    packages: read
 
 jobs:
     ci:
@@ -38,7 +34,6 @@ jobs:
             run:
                 working-directory: ${{ inputs.working-directory }}
         env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN || github.token }}
             # Turbopack/output tracing root for Next.js (see next.config.ts); the repo root is always safe.
             NEXT_WORKSPACE_ROOT: ${{ github.workspace }}
         steps:
@@ -54,8 +49,6 @@ jobs:
                   node-version-file: ${{ inputs.node-version == '' && format('{0}/.nvmrc', inputs.working-directory) || '' }}
                   cache: pnpm
                   cache-dependency-path: '**/pnpm-lock.yaml'
-                  registry-url: https://npm.pkg.github.com
-                  scope: '@phenomenon-studio'
 
             - name: Export build env
               if: inputs.build-env != ''

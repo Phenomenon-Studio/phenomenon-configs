@@ -4,6 +4,8 @@ on:
     push:
         branches: [main]
     pull_request:
+    # Started by the template update job on its PR branch.
+    workflow_dispatch:
 
 concurrency:
     group: {{ '${{ github.workflow }}-${{ github.ref }}' }}
@@ -19,4 +21,3 @@ jobs:
             build-env: |
                 NEXT_PUBLIC_API_URL=https://example.com
 {%- endif %}
-        secrets: inherit

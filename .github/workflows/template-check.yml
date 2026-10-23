@@ -7,7 +7,6 @@ on:
 
 permissions:
     contents: read
-    packages: read
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,7 +14,7 @@ concurrency:
 
 jobs:
     packages:
-        name: Packages · lint and smoke tests
+        name: Repo lint · CLI smoke test
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v7
@@ -85,6 +84,25 @@ jobs:
               env:
                   NEXT_PUBLIC_API_URL: https://example.com
               run: pnpm template:update-test ${{ matrix.stack }}
+
+    configs:
+        name: Configs only on an existing project · ${{ matrix.stack }}
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                stack: [vite, next]
+        steps:
+            - uses: actions/checkout@v7
+            - uses: astral-sh/setup-uv@v10
+            - uses: pnpm/action-setup@v6
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile
+            - name: Bare project, add shared configs (scope=configs), assert green fmt/lint/typecheck
+              run: pnpm template:configs-test ${{ matrix.stack }}
 
     renovate-config:
         name: Renovate config is valid

@@ -4,6 +4,8 @@ on:
     push:
         branches: [main]
     pull_request:
+    # Started by the template update job on its PR branch.
+    workflow_dispatch:
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,4 +15,3 @@ jobs:
     ci:
         # Pipeline lives in phenomenon-configs; fixes on the same major arrive automatically.
         uses: Phenomenon-Studio/phenomenon-configs/.github/workflows/node-ci.yml@v1
-        secrets: inherit

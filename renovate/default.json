@@ -17,28 +17,7 @@
         "schedule": ["at any time"],
         "minimumReleaseAge": null
     },
-    "hostRules": [
-        {
-            "description": "@phenomenon-studio packages on GitHub Packages; Renovate needs a token with read:packages (RENOVATE_GITHUB_PACKAGES_TOKEN org secret).",
-            "matchHost": "npm.pkg.github.com",
-            "hostType": "npm",
-            "token": "{{ secrets.RENOVATE_GITHUB_PACKAGES_TOKEN }}"
-        }
-    ],
     "packageRules": [
-        {
-            "description": "Shared configs: one PR, released by us, so no waiting period. Patch/minor automerge once CI passes.",
-            "matchPackageNames": ["@phenomenon-studio/**"],
-            "groupName": "phenomenon platform",
-            "labels": ["dependencies", "platform"],
-            "minimumReleaseAge": null,
-            "schedule": ["at any time"]
-        },
-        {
-            "matchPackageNames": ["@phenomenon-studio/**"],
-            "matchUpdateTypes": ["patch", "minor"],
-            "automerge": true
-        },
         {
             "description": "Next.js stack moves together",
             "matchPackageNames": [
@@ -66,8 +45,28 @@
             "groupName": "tailwind"
         },
         {
-            "description": "Lint/format tooling; rules themselves come from @phenomenon-studio/* packages",
-            "matchPackageNames": ["eslint", "prettier", "stylelint", "typescript", "@commitlint/**", "husky", "knip"],
+            "description": "Lint/format tooling and plugins. The configs themselves are rendered by the template and arrive with template updates",
+            "matchPackageNames": [
+                "eslint",
+                "@eslint/**",
+                "@eslint-react/**",
+                "eslint-plugin-*",
+                "eslint-config-*",
+                "@next/eslint-plugin-next",
+                "@tanstack/eslint-plugin-*",
+                "@stylistic/**",
+                "typescript-eslint",
+                "globals",
+                "prettier",
+                "prettier-plugin-*",
+                "@ianvs/prettier-plugin-sort-imports",
+                "stylelint",
+                "stylelint-config-*",
+                "typescript",
+                "@commitlint/**",
+                "husky",
+                "knip"
+            ],
             "groupName": "lint and format tooling"
         },
         {

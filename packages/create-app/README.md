@@ -1,12 +1,24 @@
 # @phenomenon-studio/create-app
 
-npm wrapper around [Copier](https://copier.readthedocs.io), run through `uvx`, so frontend developers never install Python tools by hand. It needs [uv](https://docs.astral.sh/uv/) (`brew install uv`).
+Public CLI that adds the Phenomenon Studio shared configs to a project and keeps them updated. It can also create a new project with a starter app. Nothing gets installed into your project: the configs are rendered as plain files (`eslint.config.js`, `prettier.config.js`, `tsconfig*.json`…) that you own and can edit.
+
+It wraps [Copier](https://copier.readthedocs.io) run through `uvx`, so it needs [uv](https://docs.astral.sh/uv/) (`brew install uv`). No tokens or registry setup.
 
 ```bash
-pnpm dlx @phenomenon-studio/create-app my-app [--stack vite|next] [--ref v1.4.0]
-pnpm dlx @phenomenon-studio/create-app update [--ref v1.4.0] [--defaults]   # inside a project
+# New project: starter app + configs
+pnpm dlx @phenomenon-studio/create-app my-app [--stack vite|next] [--styling tailwind|css-modules] [--ref v1.4.0]
+
+# Existing project: configs only (run in the project root; stack and styling are detected from package.json)
+pnpm dlx @phenomenon-studio/create-app init [--overwrite]
+
+# Pull the latest template release into a project created or adopted above (3-way merge keeps local edits)
+pnpm dlx @phenomenon-studio/create-app update [--ref v1.4.0] [--defaults]
 ```
+
+`init` merges the tooling devDependencies and scripts into your `package.json`. It doesn't replace the file.
 
 The Copier version is pinned in `bin/create-app.js`, and Renovate updates it.
 
-`--styling` (Vite only): `tailwind` (Tailwind v4 + shadcn/ui, default) or `css-modules` (CSS Modules + Base UI).
+## License
+
+[MIT](LICENSE) © Phenomenon Studio

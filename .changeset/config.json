@@ -1,10 +1,15 @@
 {
     "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
-    "changelog": ["@changesets/changelog-github", { "repo": "Phenomenon-Studio/phenomenon-configs" }],
+    "changelog": [
+        "@changesets/changelog-github",
+        {
+            "repo": "Phenomenon-Studio/phenomenon-configs"
+        }
+    ],
     "commit": false,
     "fixed": [],
     "linked": [],
-    "access": "restricted",
+    "access": "public",
     "baseBranch": "main",
     "updateInternalDependencies": "patch",
     "ignore": ["example-*"]

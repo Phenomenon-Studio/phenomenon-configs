@@ -1,10 +1,15 @@
 # Copier template for Phenomenon Studio projects.
 #   create:  pnpm dlx @phenomenon-studio/create-app my-app   (or: uvx copier copy --trust gh:Phenomenon-Studio/phenomenon-configs my-app)
+#   adopt:   pnpm dlx @phenomenon-studio/create-app init     (configs only, inside an existing project)
 #   update:  pnpm dlx @phenomenon-studio/create-app update   (or: uvx copier update --trust --skip-answered)
+#
+# scope=app renders a full starter. scope=configs renders only the tooling (lint, format, TS, hooks, CI, Renovate)
+# and merges its devDependencies and scripts into the existing package.json (template/tasks/sync-package-json.js).
 #
 # Layout: template/project/ holds files every project gets. Layers live in folders named
 # {{ '.' if <condition> else '' }} — the folder renders to "." when the condition holds (merged into the project root)
-# and to "" otherwise (skipped): one per stack, plus one per Vite styling approach.
+# and to "" otherwise (skipped): one per stack, plus one per Vite styling approach, all app-only. Single files use
+# {% if <condition> %}name{% endif %} the same way.
 # Files ending in .jinja are rendered; everything else is copied
 # verbatim. Versions come from template/versions.jinja.
 
@@ -17,15 +22,26 @@ _preserve_symlinks: true
 _skip_if_exists:
     - .env.local
 
+scope:
+    type: str
+    help: What to generate
+    choices:
+        New app (starter source + shared configs): app
+        Shared configs only (existing project): configs
+    default: app
+
 project_name:
     type: str
     help: Package name (kebab-case)
+    when: "{{ scope == 'app' }}"
+    default: ''
     validator: >-
-        {% if not (project_name | regex_search('^[a-z0-9][a-z0-9-]*$')) %}Use kebab-case: lowercase letters, digits and dashes{% endif %}
+        {% if scope == 'app' and not (project_name | regex_search('^[a-z0-9][a-z0-9-]*$')) %}Use kebab-case: lowercase letters, digits and dashes{% endif %}
 
 project_title:
     type: str
     help: Human-readable title (README, <title>)
+    when: "{{ scope == 'app' }}"
     default: "{{ project_name | replace('-', ' ') | title }}"
 
 stack:
@@ -41,24 +57,44 @@ styling:
     choices:
         Tailwind CSS + shadcn/ui: tailwind
         CSS Modules: css-modules
-    # Only Vite offers the choice today; Next.js ships CSS Modules (recorded so templates can branch on `styling`).
+    # New Next.js apps ship CSS Modules (recorded so templates can branch on `styling`); existing projects pick what
+    # they use, which only changes the Prettier and Stylelint configs.
     default: "{{ 'tailwind' if stack == 'vite' else 'css-modules' }}"
-    when: "{{ stack == 'vite' }}"
+    when: "{{ stack == 'vite' or scope == 'configs' }}"
+
+tailwind_stylesheet:
+    type: str
+    help: CSS entry that imports Tailwind (Prettier class sorting reads it)
+    default: ./src/styles/index.css
+    when: "{{ scope == 'configs' and styling == 'tailwind' }}"
 
 # Skipped with --skip-tasks (examples/ are regenerated that way inside the platform workspace).
 _tasks:
     - command: git init --quiet
-      when: "{{ _copier_operation == 'copy' }}"
-    - command: pnpm install
+      when: "{{ _copier_operation == 'copy' and scope == 'app' }}"
+    - command:
+          ['node', '{{ _copier_conf.src_path }}/template/tasks/sync-package-json.js', '{{ stack }}', '{{ styling }}']
+      when: "{{ scope == 'configs' }}"
+    # No lockfile on a fresh copy; on update the lockfile must follow the new package.json (CI defaults to frozen).
+    - command: pnpm install --no-frozen-lockfile
     - command: pnpm exec husky
       when: "{{ _copier_operation == 'copy' }}"
 
 _message_after_copy: |
+    {%- if scope == 'app' %}
     Created {{ project_title }} ({{ stack }}, {{ styling }}).
 
     Next steps:
       cd {{ _copier_conf.dst_path }}
       cp .env.local.example .env.local
       git add -A && git commit -m "chore: scaffold from phenomenon-configs"
+    {%- else %}
+    Added the shared configs ({{ stack }}, {{ styling }}).
+
+    Next steps:
+      git diff                      # review every replaced config; move project-specific rules under "Local overrides"
+      pnpm fix:fmt && pnpm lint && pnpm tsc
+      git add -A && git commit -m "build: adopt phenomenon-configs"
+    {%- endif %}
 
     Keep .copier-answers.yml committed: it records the template version used for updates.

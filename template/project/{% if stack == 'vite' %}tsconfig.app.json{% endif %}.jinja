@@ -1,0 +1,41 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "moduleDetection": "force",
+        "resolveJsonModule": true,
+        "allowImportingTsExtensions": true,
+        "verbatimModuleSyntax": true,
+        "isolatedModules": true,
+        "skipLibCheck": true,
+        "noEmit": true,
+        "types": ["vite/client"],
+
+        /* Browser baseline */
+        // `target` = type-check only (`noEmit`); bundlers lower syntax themselves.
+        "target": "ES2022",
+        "useDefineForClassFields": true,
+        // ES2022 = API ceiling of the Vite 8 browser baseline (chrome111 / edge111 / firefox114 / safari16.4 /
+        // ios16.4). No polyfills are shipped, so `lib` must not exceed what those browsers ship natively. Keep in sync
+        // with `ecmaVersion` in eslint.config.js.
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "jsx": "react-jsx",
+
+        /* Linting */
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "erasableSyntaxOnly": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedSideEffectImports": true,
+
+        /* Project */
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+        "rootDir": "./src",
+        "paths": {
+            "@/*": ["./src/*"]
+        }
+    },
+    "include": ["src"]
+}
