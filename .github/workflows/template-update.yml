@@ -62,7 +62,8 @@ jobs:
               with:
                   node-version-file: ${{ inputs.working-directory }}/.nvmrc
 
-            # Copier tasks run too: they merge tooling into package.json (scope=configs) and refresh the lockfile.
+            # --skip-tasks: Copier would also run the *old* version's tasks in its throwaway render of that version. The
+            # update steps (merge tooling into package.json, refresh the lockfile) run as `_migrations`, which still run.
             - name: Copier update
               id: update
               env:
@@ -77,7 +78,7 @@ jobs:
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
                   uvx --from "copier==${{ inputs.copier-version }}" copier update \
-                      --trust --defaults --skip-answered --conflict inline
+                      --trust --defaults --skip-answered --skip-tasks --conflict inline
                   after=$(grep '^_commit:' .copier-answers.yml | cut -d' ' -f2)
                   echo "before=$before" >> "$GITHUB_OUTPUT"
                   echo "after=$after" >> "$GITHUB_OUTPUT"

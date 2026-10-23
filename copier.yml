@@ -1,7 +1,7 @@
 # Copier template for Phenomenon Studio projects.
 #   create:  pnpm dlx @phenomenon-studio/create-app my-app   (or: uvx copier copy --trust gh:Phenomenon-Studio/phenomenon-configs my-app)
 #   adopt:   pnpm dlx @phenomenon-studio/create-app init     (configs only, inside an existing project)
-#   update:  pnpm dlx @phenomenon-studio/create-app update   (or: uvx copier update --trust --skip-answered)
+#   update:  pnpm dlx @phenomenon-studio/create-app update   (or: uvx copier update --trust --skip-answered --skip-tasks)
 #
 # scope=app renders a full starter. scope=configs renders only the tooling (lint, format, TS, hooks, CI, Renovate)
 # and merges its devDependencies and scripts into the existing package.json (template/tasks/sync-package-json.js).
@@ -21,6 +21,43 @@ _templates_suffix: .jinja
 _preserve_symlinks: true
 _skip_if_exists:
     - .env.local
+# The starter (src/, public/, package.json, framework configs, agent docs…) is rendered once, on copy. Updates touch
+# only the tooling files below, in both scopes; package.json then follows through sync-package-json.js (_tasks).
+# Copier also applies this list to the old-version render, so excluded files never show up as deletions.
+# Keep the allowlist in sync with the tooling files in template/project/. Copier's default exclusions are repeated
+# because setting _exclude replaces them.
+_exclude:
+    - copier.yml
+    - copier.yaml
+    - '~*'
+    - '*.py[co]'
+    - __pycache__
+    - .git
+    - .DS_Store
+    - .svn
+    - |-
+        {%- if _copier_operation == 'update' %}
+        *
+        !.copier-answers.yml
+        !.editorconfig
+        !.gitattributes
+        !.github/workflows/ci.yml
+        !.github/workflows/template-update.yml
+        !.husky/commit-msg
+        !.husky/pre-push
+        !.nvmrc
+        !.prettierignore
+        !.stylelintignore
+        !commitlint.config.js
+        !eslint.config.js
+        !pnpm-workspace.yaml
+        !prettier.config.js
+        !renovate.json
+        !stylelint.config.js
+        !tsconfig.json
+        !tsconfig.app.json
+        !tsconfig.node.json
+        {%- endif %}
 
 scope:
     type: str
@@ -68,17 +105,28 @@ tailwind_stylesheet:
     default: ./src/styles/index.css
     when: "{{ scope == 'configs' and styling == 'tailwind' }}"
 
-# Skipped with --skip-tasks (examples/ are regenerated that way inside the platform workspace).
+# Copy only. Skipped with --skip-tasks (examples/ are regenerated that way inside the platform workspace).
 _tasks:
     - command: git init --quiet
       when: "{{ _copier_operation == 'copy' and scope == 'app' }}"
     - command:
           ['node', '{{ _copier_conf.src_path }}/template/tasks/sync-package-json.js', '{{ stack }}', '{{ styling }}']
-      when: "{{ scope == 'configs' }}"
-    # No lockfile on a fresh copy; on update the lockfile must follow the new package.json (CI defaults to frozen).
+      when: "{{ _copier_operation == 'copy' and scope == 'configs' }}"
+    # No lockfile on a fresh copy.
     - command: pnpm install --no-frozen-lockfile
+      when: "{{ _copier_operation == 'copy' }}"
     - command: pnpm exec husky
       when: "{{ _copier_operation == 'copy' }}"
+
+# Update steps, both scopes. Unversioned migrations run after every update, from the new template version, in the
+# project, even with --skip-tasks. Updates pass --skip-tasks (CLI, template-update workflow) because Copier also runs
+# the old version's _tasks inside its throwaway render of that version, where they fail.
+_migrations:
+    # package.json is not rendered on update (see _exclude): merge the tooling devDependencies and scripts into it.
+    - command:
+          ['node', '{{ _copier_conf.src_path }}/template/tasks/sync-package-json.js', '{{ stack }}', '{{ styling }}']
+    # The lockfile must follow the new package.json (CI installs frozen).
+    - command: pnpm install --no-frozen-lockfile
 
 _message_after_copy: |
     {%- if scope == 'app' %}

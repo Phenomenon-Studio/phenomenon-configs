@@ -1,5 +1,5 @@
-// Copier task for scope=configs: merge the shared tooling into the project's own package.json, which the template
-// does not render (the project owns its dependencies and scripts). Runs inside the project on every copy and update.
+// Copier task (copy, scope=configs) and migration (every update, both scopes): merge the shared tooling into the
+// project's own package.json, which the template does not render then (the project owns its dependencies and scripts).
 // - devDependencies from template/tooling.jinja are added, or set to the catalog version from template/versions.jinja
 //   (moved from `dependencies` when the project listed them there).
 // - Scripts are added when missing; existing ones are left alone and reported when they differ.

@@ -230,6 +230,15 @@ const copier = (args) => {
     }
 };
 
+/** `update` finds the template version and answers in .copier-answers.yml; stop if Copier did not write it. */
+const requireAnswers = (dir) => {
+    if (!existsSync(join(dir, '.copier-answers.yml'))) {
+        fail(
+            `Copier did not write ${join(dir, '.copier-answers.yml')}, so \`update\` cannot find this project's template version.`
+        );
+    }
+};
+
 const ref = values.ref ? ['--vcs-ref', values.ref] : [];
 const source = `${values.template}${values.ref ? ` @ ${values.ref}` : ' @ latest release'}`;
 const [command, directory] = positionals;
@@ -267,7 +276,15 @@ if (command === 'update') {
     checkGit({ required: true });
 
     ui.step('Applying the template update (3-way merge)');
-    copier(['update', '--trust', '--skip-answered', ...ref, ...(values.defaults ? ['--defaults'] : [])]);
+    // --skip-tasks: see copier.yml `_migrations` (the update steps run there, from the new template version).
+    copier([
+        'update',
+        '--trust',
+        '--skip-answered',
+        '--skip-tasks',
+        ...ref,
+        ...(values.defaults ? ['--defaults'] : []),
+    ]);
     ui.box('Update applied', [
         `Review:   ${ui.code('git diff')}`,
         `Conflicts: ${ui.code("git grep -n '^<<<<<<< '")} ${ui.dim('(resolve, keep local intent)')}`,
@@ -314,6 +331,7 @@ if (command === 'update') {
         values.template,
         '.',
     ]);
+    requireAnswers('.');
     ui.box('Shared configs added', [
         `Review:  ${ui.code('git diff')} ${ui.dim('(move project rules under "Local overrides")')}`,
         `Fix:     ${ui.code('pnpm fix:fmt && pnpm lint && pnpm tsc')}`,
@@ -358,6 +376,7 @@ if (command === 'update') {
         values.template,
         target,
     ]);
+    requireAnswers(target);
     ui.box('Project created', [
         `Open:    ${ui.code(`cd ${/\s/.test(target) ? JSON.stringify(target) : target}`)}`,
         `Env:     ${ui.code('cp .env.local.example .env.local')}`,

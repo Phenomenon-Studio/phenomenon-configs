@@ -24,7 +24,7 @@ Rule change ─────────▶ template/project/*.config.js         
                       │   sync-examples.yml re-renders examples/    │
                       │   template-check builds both stacks         │
                       │   merge → release-template (vX.Y.Z)         │──copier──▶ Template update PR
-                      └─────────────────────────────────────────────┘  update   (configs, package.json, .nvmrc…)
+                      └─────────────────────────────────────────────┘  update   (tooling files, tooling deps)
 
                                                                          Renovate ▶ project's own deps
                                                                          (shared preset: same groups,
@@ -32,8 +32,8 @@ Rule change ─────────▶ template/project/*.config.js         
 ```
 
 - **New projects** always start from the catalog at the template tag they were created from.
-- **Existing projects** get catalog moves and rule changes through the weekly template update PR. Dependencies can also arrive earlier through their own Renovate. Both edit the same `package.json` lines. When Renovate already moved a dependency to the same version, Copier's 3-way merge sees identical edits and applies nothing. When the versions differ, the PR shows a conflict on that line. Keep the newer version.
-- **Configs-only projects** (`scope=configs`) don't get `package.json` from the template. The Copier task [`template/tasks/sync-package-json.js`](../template/tasks/sync-package-json.js) sets the tooling devDependencies to the catalog versions and adds missing scripts on every copy and update.
+- **Existing projects** get rule changes and **tooling** catalog moves through the weekly template update PR. Updates never re-render `package.json`: the Copier migration [`template/tasks/sync-package-json.js`](../template/tasks/sync-package-json.js) sets the tooling devDependencies to the catalog versions and adds missing scripts, in both scopes. Runtime dependencies (react, next, vite…) move only through the project's own Renovate.
+- **Configs-only projects** (`scope=configs`) never get `package.json` from the template. The same script merges the tooling into it on `init`.
 
 ## Adding or changing a dependency in the template
 
@@ -42,7 +42,7 @@ Rule change ─────────▶ template/project/*.config.js         
 3. `pnpm examples:regen && pnpm install && pnpm check`.
 4. Commit the template, the regenerated examples and `pnpm-lock.yaml` together.
 
-Use a version at least 3 days old. Generated projects install with `minimumReleaseAge: 4320`, and a fresher pin fails `pnpm install`. `node scripts/pin-mature-versions.js <package.json>` finds the newest version old enough.
+Use a version at least 3 days old. This repo installs with `minimumReleaseAge: 4320`, and a fresher pin fails `pnpm install` here. Generated projects only require 60 minutes, because catalog versions are vetted here first. `node scripts/pin-mature-versions.js <package.json>` finds the newest version old enough.
 
 ## Renovate setup (once per org)
 

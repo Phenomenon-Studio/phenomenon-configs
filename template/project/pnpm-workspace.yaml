@@ -2,7 +2,11 @@ engineStrict: true
 ignoreScripts: true
 saveExact: true
 savePrefix: ''
-minimumReleaseAge: 4320
+# Versions from the platform catalog are already at least 3 days old (phenomenon-configs installs with 4320), so an
+# hour is enough here. The CLI is first-party and usable as soon as it is published.
+minimumReleaseAge: 60
+minimumReleaseAgeExclude:
+    - '@phenomenon-studio/create-app'
 # NOTE: If release age is undefined, verify the dependency manually.
 # Once verified, comment out or set to true this line to allow the installation.
 minimumReleaseAgeIgnoreMissingTime: false

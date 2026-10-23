@@ -168,7 +168,9 @@ After `init`, follow [docs/migrating.md](docs/migrating.md): remove old config f
 
 ### `create-app update`: pull the latest template release
 
-Works in any project created by `create-app` or adopted with `init`, because both have `.copier-answers.yml`. Copier does a **3-way merge**: template changes are applied on top of your local edits. Where both changed the same lines you get `<<<<<<<` conflict markers to resolve.
+Works in any project created by `create-app` or adopted with `init`, because both have `.copier-answers.yml`. Updates touch **tooling only**, in both scopes: the files in the `init` table's first column, plus `package.json` merged the same way as `init` (tooling devDependencies and missing scripts). The starter (`src/`, `public/`, framework config, README, agent docs, runtime dependencies) is rendered once, at creation, and stays yours. Runtime dependencies are updated by the project's Renovate.
+
+Copier does a **3-way merge**: template changes are applied on top of your local edits. Where both changed the same lines you get `<<<<<<<` conflict markers to resolve.
 
 ```bash
 pnpm dlx @phenomenon-studio/create-app update            # latest release
@@ -258,8 +260,10 @@ pnpm lint && pnpm tsc && pnpm build && git commit -am "build(template): update"
 | What changed | How it reaches the project |
 | --- | --- |
 | A lint/TS/format rule, an ESLint or Prettier plugin | Template release → weekly **Template update** PR (`copier update`) |
-| A non-extendable file (`.gitignore`, hooks, `vite.config.ts`…) | Template release → weekly **Template update** PR |
-| A dependency version (react, next, vite, Node, pnpm…) | Project Renovate PR (shared preset) **or** the template update PR when the platform catalog moved |
+| A tooling file (hooks, `.nvmrc`, `.editorconfig`, `pnpm-workspace.yaml`…) | Template release → weekly **Template update** PR |
+| A tooling dependency (eslint, prettier, typescript, plugins…) | Template update PR (catalog moved) **or** project Renovate PR |
+| A runtime dependency (react, next, vite…) | Project Renovate PR (shared preset) |
+| A starter file (`src/`, `vite.config.ts`, `.gitignore`…) | New projects only. Existing projects copy the change by hand if they want it |
 | The CI pipeline | Picked up automatically on the next run (`node-ci.yml@v1`); majors need a template update |
 
 The weekly update PR (`.github/workflows/template-update.yml`, Mondays 06:00 UTC, or **Run workflow** by hand) needs no secret. It uses the project's `GITHUB_TOKEN` and starts CI on its branch through `workflow_dispatch`. `GITHUB_TOKEN` can't push `.github/workflows` changes, so those come as a patch in the PR body. Apply it with `git apply` before merging.
@@ -276,8 +280,8 @@ Keep project-specific changes under `// Local overrides only.` in each config so
 | `No package.json in the current directory` | `cd` to the project root before `init` |
 | `<<<<<<<` markers after update | Edit each file to keep both intents, remove the markers, rerun `pnpm lint` |
 | Template update PR fails to open | Turn on "Allow GitHub Actions to create and approve pull requests" in the repo or org settings |
-| `pnpm install` rejects a version as too new | The project enforces a 3-day `minimumReleaseAge`. Wait, or pin an older version |
-| `pnpm dlx` runs an older CLI version right after a release | pnpm skips versions younger than its `minimumReleaseAge` (3 days). Pin the version: `pnpm dlx @phenomenon-studio/create-app@1.0.2 …`, or use `npx @phenomenon-studio/create-app …` |
+| `pnpm install` rejects a version as too new | The project enforces a 1-hour `minimumReleaseAge`. Wait, or pin an older version |
+| `pnpm dlx` runs an older CLI version right after a release | Generated projects exclude the CLI from `minimumReleaseAge`. Elsewhere pnpm's own `minimumReleaseAge` applies. Pin the version: `pnpm dlx @phenomenon-studio/create-app@1.0.2 …`, or use `npx @phenomenon-studio/create-app …` |
 
 ## What lives where
 
@@ -351,7 +355,7 @@ pnpm deps:update     # pnpm update --interactive --latest --recursive, then writ
 pnpm check           # prove every stack still lints, type-checks and builds
 ```
 
-`pnpm deps:update` works because the examples are workspace members whose `package.json` is rendered from the catalog. pnpm edits them, and `scripts/catalog-from-examples.js` copies the chosen versions back (`pnpm deps:sync` reruns only that part). If you edit `versions.jinja` by hand, run `pnpm examples:regen && pnpm install`. Versions must be at least 3 days old (`minimumReleaseAge`). `node scripts/pin-mature-versions.js <package.json>` finds the newest version that qualifies.
+`pnpm deps:update` works because the examples are workspace members whose `package.json` is rendered from the catalog. pnpm edits them, and `scripts/catalog-from-examples.js` copies the chosen versions back (`pnpm deps:sync` reruns only that part). If you edit `versions.jinja` by hand, run `pnpm examples:regen && pnpm install`. Versions must be at least 3 days old (this repo's `minimumReleaseAge`). That is the vetting step: generated projects then install with only a 1-hour minimum. `node scripts/pin-mature-versions.js <package.json>` finds the newest version that qualifies.
 
 ### Change a config rule
 
