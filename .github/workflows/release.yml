@@ -1,4 +1,5 @@
-# CLI package: Changesets opens a "Version packages" PR; merging it publishes to npmjs.com.
+# One version line for the CLI and the template. Changesets opens a "Version packages" PR; merging it publishes the
+# CLI to npmjs.com, then tags the template vX.Y.Z with the same version.
 # Publishing uses npm trusted publishing (OIDC, `id-token: write`), so no npm token is stored anywhere. Configure it
 # once per package on npmjs.com → package settings → Trusted publishing → GitHub Actions
 # (Phenomenon-Studio/phenomenon-configs, workflow release.yml).
@@ -34,5 +35,31 @@ jobs:
                   publish: pnpm release-packages
                   title: 'build(release): version packages'
                   commit: 'build(release): version packages'
+                  # One release per version, created below for the template tag.
+                  createGithubReleases: false
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            # Tags vX.Y.Z (Copier reads these as template versions) once the CLI version is on npm, moves the vX major
+            # branch (reusable workflows are pinned `@v1`; a moving tag would be read by Copier as a version) and
+            # creates the GitHub release from the changelog. Idempotent: a no-op when the tag already exists.
+            - name: Tag template release
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  version=$(node -p "require('./packages/create-app/package.json').version")
+                  tag="v$version"
+                  git fetch --quiet --tags origin
+                  if git rev-parse --quiet --verify "refs/tags/$tag" > /dev/null; then
+                      echo "$tag exists"; exit 0
+                  fi
+                  if [ "$(npm view "@phenomenon-studio/create-app@$version" version)" != "$version" ]; then
+                      echo "::error::@phenomenon-studio/create-app@$version is not on npm; not tagging $tag"; exit 1
+                  fi
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git tag -a "$tag" -m "$tag"
+                  git push origin "$tag"
+                  git push --force origin "HEAD:refs/heads/${tag%%.*}"
+                  awk -v heading="## $version" '$0 == heading { found = 1; next } found && /^## / { exit } found' \
+                      packages/create-app/CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+                  gh release create "$tag" --verify-tag --title "$tag" --notes-file "$RUNNER_TEMP/notes.md"

@@ -1,27 +1,22 @@
 # Releasing
 
-The CLI and the template ship on separate lines.
+The CLI and the template share one version. `packages/create-app/package.json` is the only version source, managed by Changesets: CLI `1.4.0` and template `v1.4.0` are the same release.
 
-| Artifact | Version source | Tag | Consumers pin |
-| --- | --- | --- | --- |
-| `@phenomenon-studio/create-app` (public, npmjs.com) | Changesets | `@phenomenon-studio/create-app@1.1.0` | nothing: run with `pnpm dlx` (latest) |
-| Copier template (configs, starter, catalog) | git tag | `v1.4.0` (Copier ignores other tags) | `_commit` in `.copier-answers.yml` |
-| Reusable workflows | same tag + moving major **branch** (a tag would be read by Copier as a version) | `v1.4.0`, `v1` | `@v1` |
-| Renovate preset | default branch | — | always latest |
+| Artifact | Tag | Consumers pin |
+| --- | --- | --- |
+| `@phenomenon-studio/create-app` (public, npmjs.com) | `@phenomenon-studio/create-app@1.4.0` | nothing: run with `pnpm dlx` (latest) |
+| Copier template (configs, starter, catalog) | `v1.4.0` (Copier ignores other tags) | `_commit` in `.copier-answers.yml` |
+| Reusable workflows | `v1.4.0` + moving major **branch** `v1` (a tag would be read by Copier as a version) | `@v1` |
+| Renovate preset | default branch | always latest |
 
-Config rule changes are template changes. They ship with a `vX.Y.Z` tag and reach projects as a template update PR. No package needs publishing.
+## Release
 
-## CLI
-
-1. In the PR, run `pnpm changeset` and pick the bump type.
+1. In every PR that should reach projects (CLI, template, rules, catalog, reusable workflows), run `pnpm changeset`, pick `@phenomenon-studio/create-app` and the bump type, and describe the change. Template-only changes bump the CLI version too. Merge with regenerated `examples/` (CI enforces this).
 2. On merge, `release.yml` opens or updates **build(release): version packages**. That PR bumps the version and writes the changelog.
-3. Merging that PR publishes to npmjs.com from CI through npm trusted publishing (GitHub OIDC). No npm token is stored. Never publish from a laptop, except the first publish.
-
-## Template and workflows
-
-1. Merge template or workflow changes with regenerated `examples/`. CI enforces this.
-2. Actions → **Release template** → `vX.Y.Z`. The workflow validates that the version is greater than the last one, tags it, moves the `vX` branch and creates a GitHub release with generated notes.
-3. Projects get a **build(template): update to vX.Y.Z** PR within a week (Monday 06:00 UTC), or sooner via `workflow_dispatch` / `pnpm dlx @phenomenon-studio/create-app update`.
+3. Merging that PR runs `release.yml`, which:
+    - publishes the CLI to npmjs.com through npm trusted publishing (GitHub OIDC). No npm token is stored. Never publish from a laptop, except the first publish.
+    - tags the template `vX.Y.Z` on the same commit, moves the `vX` branch and creates the GitHub release from the changelog.
+4. Projects get a **build(template): update to vX.Y.Z** PR within a week (Monday 06:00 UTC), or sooner via `workflow_dispatch` / `pnpm dlx @phenomenon-studio/create-app update`.
 
 ## Breaking changes
 
@@ -39,5 +34,5 @@ Breaking changes go out as major bumps only.
 - [ ] First publish by an org member, by hand: `cd packages/create-app && npm publish --access public`. npm only allows trusted publishing on a package that already exists.
 - [ ] npmjs.com → `@phenomenon-studio/create-app` → Settings → Trusted publishing → GitHub Actions: `Phenomenon-Studio/phenomenon-configs`, workflow `release.yml`. Then disallow token publishing for the package.
 - [ ] Owners filled in `.github/CODEOWNERS`.
-- [ ] Run **Release template** with `v1.0.0`, then `pnpm dlx @phenomenon-studio/create-app /tmp/smoke` works from any machine.
+- [ ] Merge the first version PR, then `pnpm dlx @phenomenon-studio/create-app /tmp/smoke` works from any machine.
 - [ ] In project repos (or org-wide): Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests", for the template update PR.

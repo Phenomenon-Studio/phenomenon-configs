@@ -23,7 +23,7 @@ Renovate PR ─────────▶ template/versions.jinja              
 Rule change ─────────▶ template/project/*.config.js                 │
                       │   sync-examples.yml re-renders examples/    │
                       │   template-check builds both stacks         │
-                      │   merge → release-template (vX.Y.Z)         │──copier──▶ Template update PR
+                      │   version PR merge → release (vX.Y.Z)       │──copier──▶ Template update PR
                       └─────────────────────────────────────────────┘  update   (tooling files, tooling deps)
 
                                                                          Renovate ▶ project's own deps
