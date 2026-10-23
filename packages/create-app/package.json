@@ -1,6 +1,6 @@
 {
     "name": "@phenomenon-studio/create-app",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Create a Phenomenon Studio project, or add and update the shared configs in an existing one (Copier template)",
     "license": "MIT",
     "type": "module",
