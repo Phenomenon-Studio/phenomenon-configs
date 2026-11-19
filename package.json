@@ -27,15 +27,15 @@
         "deps:sync": "node scripts/catalog-from-examples.js && pnpm examples:regen && pnpm install --no-frozen-lockfile"
     },
     "devDependencies": {
-        "@changesets/changelog-github": "0.7.0",
-        "@changesets/cli": "2.31.1",
+        "@changesets/changelog-github": "1.0.1",
+        "@changesets/cli": "3.0.3",
         "@commitlint/cli": "21.2.4",
         "@commitlint/config-conventional": "21.2.4",
         "@ianvs/prettier-plugin-sort-imports": "4.7.1",
-        "eslint": "10.13.0",
+        "eslint": "10.15.0",
         "husky": "9.1.7",
-        "prettier": "3.9.10",
-        "turbo": "2.11.9",
+        "prettier": "3.10.1",
+        "turbo": "2.11.11",
         "typescript": "6.0.3",
         "yaml": "2.9.1"
     }
